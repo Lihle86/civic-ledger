@@ -31,20 +31,8 @@ document.addEventListener("DOMContentLoaded", () => {
   const savedMessage = document.getElementById("savedMessage");
 
   const rates = {
-    area12: {
-      A: 7350,
-      B: 7165,
-      C: 7003,
-      D: 6840,
-      E: 6660
-    },
-    area3: {
-      A: 6860,
-      B: 6680,
-      C: 6500,
-      D: 6320,
-      E: 6150
-    }
+    area12: { A: 7350, B: 7165, C: 7003, D: 6840, E: 6660 },
+    area3: { A: 6860, B: 6680, C: 6500, D: 6320, E: 6150 }
   };
 
   const NIGHT_ALLOWANCE_PER_SHIFT = 8;
@@ -139,6 +127,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
   function saveAudit() {
     const record = getAuditRecord();
+
     localStorage.setItem(
       "civicLedgerLastAudit",
       JSON.stringify(record)
