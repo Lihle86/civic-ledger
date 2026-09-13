@@ -154,12 +154,12 @@ document.addEventListener("DOMContentLoaded", function () {
     savedMessage.classList.remove("hidden");
   }
 
+  
   function exportAudit() {
     const record = getAuditRecord();
 
     const report = [
       "Civic Ledger Wage Audit",
-      "",
       "Audit month: " + (record.auditMonth || "Not entered"),
       "Wage area: " + record.area,
       "Security grade: " + record.grade,
@@ -171,9 +171,8 @@ document.addEventListener("DOMContentLoaded", function () {
       "Actual pay: " + money(record.actualPay),
       "Estimated reference total: " + record.estimatedReferenceTotal,
       "Possible estimated shortfall: " + record.estimatedShortfall,
-      "",
       "This is an independent estimate and must be checked against payslips, contracts, rosters and the applicable agreement."
-    ].join(" | ") ;
+    ].join(" | ");
 
     const blob = new Blob([report], {
       type: "text/plain"
