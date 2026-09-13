@@ -70,6 +70,7 @@
       <input id="auditMonth" type="month">
     </section>
 
+
     <section class="card">
       <h2>Work and payment information</h2>
 
@@ -185,6 +186,80 @@
       </button>
     </section>
 
+    <section class="card">
+      <h2>Report a Site Concern</h2>
+
+      <p class="help-text">
+        Use this section to record a possible wage or payroll problem at the
+        exact security worksite. This is for organised information and later
+        verification. It does not automatically prove wrongdoing.
+      </p>
+
+      <label for="siteName">Client or worksite name</label>
+      <input
+        id="siteName"
+        type="text"
+        maxlength="100"
+        placeholder="Example: Byers CCID"
+      >
+
+      <label for="siteAddress">Exact worksite address</label>
+      <textarea
+        id="siteAddress"
+        rows="3"
+        maxlength="250"
+        placeholder="Enter the physical address of the site"
+      ></textarea>
+
+      <label for="securityCompany">Security company</label>
+      <input
+        id="securityCompany"
+        type="text"
+        maxlength="100"
+        placeholder="Company name, if known"
+      >
+
+      <label for="guardsAffected">Number of guards affected</label>
+      <input
+        id="guardsAffected"
+        type="number"
+        min="1"
+        step="1"
+        placeholder="Example: 12"
+      >
+
+      <label for="expectedPay">Expected monthly pay per guard</label>
+      <input
+        id="expectedPay"
+        type="number"
+        min="0"
+        step="0.01"
+        placeholder="Optional"
+      >
+
+      <label for="actualSitePay">Actual monthly pay per guard</label>
+      <input
+        id="actualSitePay"
+        type="number"
+        min="0"
+        step="0.01"
+        placeholder="Optional"
+      >
+
+      <label for="siteConcern">What appears to require verification?</label>
+      <textarea
+        id="siteConcern"
+        rows="5"
+        maxlength="1000"
+        placeholder="Describe the issue without entering ID numbers or bank details"
+      ></textarea>
+
+      <button id="siteReportButton" type="button">
+        Create site report
+      </button>
+
+      <div id="siteReportResult" class="success-message hidden"></div>
+    </section>
     <section class="card">
       <h2>Privacy notice</h2>
       <p class="privacy-text">
