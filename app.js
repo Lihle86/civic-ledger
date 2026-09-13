@@ -30,6 +30,11 @@ document.addEventListener("DOMContentLoaded", function () {
   const actualPayResult = document.getElementById("actualPayResult");
   const savedMessage = document.getElementById("savedMessage");
 
+  const siteReportButton =
+    document.getElementById("siteReportButton");
+
+  const siteReportResult =
+    document.getElementById("siteReportResult");
   const rates = {
     area12: {
       A: 7350,
@@ -190,8 +195,68 @@ document.addEventListener("DOMContentLoaded", function () {
     URL.revokeObjectURL(url);
   }
 
+    function createSiteReport() {
+    const siteName = document.getElementById("siteName").value.trim();
+    const siteAddress = document.getElementById("siteAddress").value.trim();
+    const securityCompany = document.getElementById("securityCompany").value.trim();
+    const guardsAffected =
+      Number(document.getElementById("guardsAffected").value) || 0;
+    const expectedPay =
+      Number(document.getElementById("expectedPay").value) || 0;
+    const actualSitePay =
+      Number(document.getElementById("actualSitePay").value) || 0;
+    const siteConcern =
+      document.getElementById("siteConcern").value.trim();
+
+    if (
+      !siteName ||
+      !siteAddress ||
+      !securityCompany ||
+      guardsAffected < 1 ||
+      !siteConcern
+    ) {
+      siteReportResult.textContent =
+        "Please complete the worksite, address, company, affected-guard number and concern fields.";
+      siteReportResult.classList.remove("hidden");
+      return;
+    }
+
+    const caseNumber =
+      "CL-SITE-" +
+      new Date().toISOString().replace(/D/g, "").slice(0, 14);
+
+    const estimatedShortfall =
+      Math.max(expectedPay - actualSitePay, 0) * guardsAffected;
+
+    const report = {
+      caseNumber: caseNumber,
+      createdAt: new Date().toISOString(),
+      siteName: siteName,
+      siteAddress: siteAddress,
+      securityCompany: securityCompany,
+      guardsAffected: guardsAffected,
+      expectedPay: expectedPay,
+      actualSitePay: actualSitePay,
+      estimatedShortfall: estimatedShortfall,
+      siteConcern: siteConcern
+    };
+
+    localStorage.setItem(
+      "civicLedgerLastSiteReport",
+      JSON.stringify(report)
+    );
+
+    siteReportResult.textContent =
+      "Report created locally. Case number: " +
+      caseNumber +
+      ". It has not been sent to inspectors.";
+
+    siteReportResult.classList.remove("hidden");
+  }
+
   auditButton.addEventListener("click", calculateAudit);
   clearButton.addEventListener("click", clearAudit);
   saveButton.addEventListener("click", saveAudit);
   exportButton.addEventListener("click", exportAudit);
+  siteReportButton.addEventListener("click", createSiteReport);
 });
