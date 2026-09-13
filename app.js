@@ -173,7 +173,7 @@ document.addEventListener("DOMContentLoaded", function () {
       "Possible estimated shortfall: " + record.estimatedShortfall,
       "",
       "This is an independent estimate and must be checked against payslips, contracts, rosters and the applicable agreement."
-    ].join("");
+    ].join(" | ") ;
 
     const blob = new Blob([report], {
       type: "text/plain"
