@@ -50,7 +50,7 @@
       <label for="area">Wage area</label>
       <select id="area">
         <option value="area12">
-          Area 1 & 2 — Major cities and urban centres
+          Area 1 &amp; 2 — Major cities and urban centres
         </option>
         <option value="area3">
           Area 3 — Other areas and rural areas
@@ -61,7 +61,7 @@
       <select id="grade">
         <option value="A">Grade A</option>
         <option value="B">Grade B</option>
-        <option value="C">Grade C</option>
+        <option value="C" selected>Grade C</option>
         <option value="D">Grade D</option>
         <option value="E">Grade E</option>
       </select>
@@ -83,6 +83,12 @@
 
       <label for="holidayHours">Public-holiday hours worked</label>
       <input id="holidayHours" type="number" min="0" step="0.5" value="0">
+
+      <p class="help-text">
+        Sunday and public-holiday hours are recorded for your audit record.
+        They are not included in this estimate yet because the correct
+        calculation depends on the applicable agreement and employment details.
+      </p>
 
       <label for="nightShifts">Night shifts worked</label>
       <input id="nightShifts" type="number" min="0" step="1" value="0">
@@ -201,22 +207,3 @@
   <script src="app.js"></script>
 </body>
 </html>
-
-
-<label>
-  Sunday hours worked
-  <input type="number" ...>
-</label>
-
-<label>
-  Public-holiday hours worked
-  <input type="number" ...>
-</label>
-
-<p class="help-text">
-  Sunday and public-holiday hours are recorded for your audit record.
-  They are not included in this estimate yet because the correct
-  calculation depends on the applicable agreement and employment details.
-</p>
-
-</form>
