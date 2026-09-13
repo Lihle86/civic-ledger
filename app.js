@@ -179,13 +179,6 @@ document.addEventListener("DOMContentLoaded", function () {
       type: "text/plain"
     });
 
-      "This is an independent estimate and must be checked against payslips, contracts, rosters and the applicable agreement."
-    ].join("
-");
-
-    const blob = new Blob([report], {
-      type: "text/plain"
-    });
     const url = URL.createObjectURL(blob);
     const link = document.createElement("a");
 
