@@ -1,4 +1,4 @@
-document.addEventListener("DOMContentLoaded", () => {
+document.addEventListener("DOMContentLoaded", function () {
   const workerName = document.getElementById("workerName");
   const area = document.getElementById("area");
   const grade = document.getElementById("grade");
@@ -31,8 +31,20 @@ document.addEventListener("DOMContentLoaded", () => {
   const savedMessage = document.getElementById("savedMessage");
 
   const rates = {
-    area12: { A: 7350, B: 7165, C: 7003, D: 6840, E: 6660 },
-    area3: { A: 6860, B: 6680, C: 6500, D: 6320, E: 6150 }
+    area12: {
+      A: 7350,
+      B: 7165,
+      C: 7003,
+      D: 6840,
+      E: 6660
+    },
+    area3: {
+      A: 6860,
+      B: 6680,
+      C: 6500,
+      D: 6320,
+      E: 6150
+    }
   };
 
   const NIGHT_ALLOWANCE_PER_SHIFT = 8;
@@ -40,10 +52,10 @@ document.addEventListener("DOMContentLoaded", () => {
   const CLEANING_ALLOWANCE = 32;
 
   function money(value) {
-    return `R ${Number(value).toLocaleString("en-ZA", {
+    return "R " + Number(value).toLocaleString("en-ZA", {
       minimumFractionDigits: 2,
       maximumFractionDigits: 2
-    })}`;
+    });
   }
 
   function numberValue(input) {
@@ -52,10 +64,13 @@ document.addEventListener("DOMContentLoaded", () => {
 
   function calculateAudit() {
     const baseWage = rates[area.value][grade.value];
+
     const nightTotal =
       numberValue(nightShifts) * NIGHT_ALLOWANCE_PER_SHIFT;
+
     const specialTotal =
       numberValue(specialShifts) * SPECIAL_ALLOWANCE_PER_SHIFT;
+
     const cleaningTotal = cleaningAllowance.checked
       ? CLEANING_ALLOWANCE
       : 0;
@@ -135,6 +150,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
     savedMessage.textContent =
       "Audit saved locally on this device.";
+
     savedMessage.classList.remove("hidden");
   }
 
@@ -144,18 +160,25 @@ document.addEventListener("DOMContentLoaded", () => {
     const report = [
       "Civic Ledger Wage Audit",
       "",
-      `Audit month: ${record.auditMonth || "Not entered"}`,
-      `Wage area: ${record.area}`,
-      `Security grade: ${record.grade}`,
-      `Ordinary shifts: ${record.ordinaryShifts}`,
-      `Sunday hours: ${record.sundayHours}`,
-      `Public-holiday hours: ${record.holidayHours}`,
-      `Night shifts: ${record.nightShifts}`,
-      `Qualifying allowance shifts: ${record.specialShifts}`,
-      `Actual pay: ${money(record.actualPay)}`,
-      `Estimated reference total: ${record.estimatedReferenceTotal}`,
-      `Possible estimated shortfall: ${record.estimatedShortfall}`,
+      "Audit month: " + (record.auditMonth || "Not entered"),
+      "Wage area: " + record.area,
+      "Security grade: " + record.grade,
+      "Ordinary shifts: " + record.ordinaryShifts,
+      "Sunday hours: " + record.sundayHours,
+      "Public-holiday hours: " + record.holidayHours,
+      "Night shifts: " + record.nightShifts,
+      "Qualifying allowance shifts: " + record.specialShifts,
+      "Actual pay: " + money(record.actualPay),
+      "Estimated reference total: " + record.estimatedReferenceTotal,
+      "Possible estimated shortfall: " + record.estimatedShortfall,
       "",
+      "This is an independent estimate and must be checked against payslips, contracts, rosters and the applicable agreement."
+    ].join("");
+
+    const blob = new Blob([report], {
+      type: "text/plain"
+    });
+
       "This is an independent estimate and must be checked against payslips, contracts, rosters and the applicable agreement."
     ].join("
 ");
@@ -163,7 +186,6 @@ document.addEventListener("DOMContentLoaded", () => {
     const blob = new Blob([report], {
       type: "text/plain"
     });
-
     const url = URL.createObjectURL(blob);
     const link = document.createElement("a");
 
