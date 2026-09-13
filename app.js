@@ -221,9 +221,11 @@ document.addEventListener("DOMContentLoaded", function () {
       return;
     }
 
+        const now = new Date();
+
     const caseNumber =
       "CL-SITE-" +
-      new Date().toISOString().replace(/D/g, "").slice(0, 14);
+      now.getTime();
 
     const estimatedShortfall =
       Math.max(expectedPay - actualSitePay, 0) * guardsAffected;
