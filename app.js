@@ -302,7 +302,8 @@ document.addEventListener("DOMContentLoaded", () => {
       return;
     }
 
-    const audit = latestAudit || calculateValues();
+   calculateAudit();
+const audit = latestAudit;  
     const caseNumber = createCaseNumber();
     const accessCode = secureCode(10);
     const now = new Date().toISOString();
