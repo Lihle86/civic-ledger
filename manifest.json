@@ -1,12 +1,12 @@
 {
-  "name": "Civic Ledger Verification",
+  "name": "Civic Ledger Verification & Weather",
   "short_name": "Civic Ledger",
   "start_url": "./",
   "scope": "./",
   "display": "standalone",
   "background_color": "#0f172a",
   "theme_color": "#0f172a",
-  "description": "Civic Ledger private-security wage audit pilot",
+  "description": "Civic Ledger private-security wage audit pilot with weather dashboard",
   "icons": [
     {
       "src": "icon-32.png",
@@ -25,6 +25,20 @@
       "sizes": "512x512",
       "type": "image/png",
       "purpose": "any maskable"
+    }
+  ],
+  "screenshots": [
+    {
+      "src": "screenshot-540.png",
+      "sizes": "540x720",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "screenshot-1080.png",
+      "sizes": "1080x1440",
+      "type": "image/png",
+      "purpose": "any"
     }
   ]
 }
