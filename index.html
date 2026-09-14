@@ -2,14 +2,22 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <meta name="theme-color" content="#0f172a">
-  <meta name="description" content="Free Civic Ledger wage audit pilot for private-security workers">
-  <title>Civic Ledger Wage Audit</title>
-  <link rel="stylesheet" href="style.css">
-<link rel="manifest" href="manifest.json">
-<link rel="icon" href="icon-192.png" type="image/png">
+  <meta
+    name="viewport"
+    content="width=device-width, initial-scale=1.0"
+  >
 
+  <meta name="theme-color" content="#0f172a">
+  <meta
+    name="description"
+    content="Free Civic Ledger wage audit pilot for private-security workers"
+  >
+
+  <title>Civic Ledger Wage Audit</title>
+
+  <link rel="stylesheet" href="style.css">
+  <link rel="manifest" href="manifest.json">
+  <link rel="icon" href="icon-192x192.png" type="image/png">
 </head>
 
 <body>
@@ -17,6 +25,7 @@
 
     <header class="app-header">
       <div class="logo">CL</div>
+
       <div>
         <h1>Civic Ledger</h1>
         <p>Free wage-audit pilot</p>
@@ -25,6 +34,7 @@
 
     <section class="card introduction">
       <h2>Understand your pay records</h2>
+
       <p>
         Enter your work information to estimate the difference between
         the reference wage and the amount you received.
@@ -42,7 +52,10 @@
     <section class="card">
       <h2>Work profile</h2>
 
-      <label for="workerName">Name or private reference</label>
+      <label for="workerName">
+        Name or private reference
+      </label>
+
       <input
         id="workerName"
         type="text"
@@ -51,16 +64,19 @@
       >
 
       <label for="area">Wage area</label>
+
       <select id="area">
         <option value="area12">
           Area 1 &amp; 2 — Major cities and urban centres
         </option>
+
         <option value="area3">
           Area 3 — Other areas and rural areas
         </option>
       </select>
 
       <label for="grade">Security grade</label>
+
       <select id="grade">
         <option value="A">Grade A</option>
         <option value="B">Grade B</option>
@@ -70,9 +86,12 @@
       </select>
 
       <label for="auditMonth">Audit month</label>
-      <input id="auditMonth" type="month">
-    </section>
 
+      <input
+        id="auditMonth"
+        type="month"
+      >
+    </section>
 
     <section class="card">
       <h2>Work and payment information</h2>
@@ -80,27 +99,69 @@
       <label for="ordinaryShifts">
         Ordinary shifts worked — 12-hour units
       </label>
-      <input id="ordinaryShifts" type="number" min="0" step="1" value="16">
 
-      <label for="sundayHours">Sunday hours worked</label>
-      <input id="sundayHours" type="number" min="0" step="0.5" value="0">
+      <input
+        id="ordinaryShifts"
+        type="number"
+        min="0"
+        step="1"
+        value="16"
+      >
 
-      <label for="holidayHours">Public-holiday hours worked</label>
-      <input id="holidayHours" type="number" min="0" step="0.5" value="0">
+      <label for="sundayHours">
+        Sunday hours worked
+      </label>
+
+      <input
+        id="sundayHours"
+        type="number"
+        min="0"
+        step="0.5"
+        value="0"
+      >
+
+      <label for="holidayHours">
+        Public-holiday hours worked
+      </label>
+
+      <input
+        id="holidayHours"
+        type="number"
+        min="0"
+        step="0.5"
+        value="0"
+      >
 
       <p class="help-text">
         Sunday and public-holiday hours are recorded for your audit record.
-        They are not included in this estimate yet because the correct
-        calculation depends on the applicable agreement and employment details.
+        They are not included in this preliminary estimate because the
+        correct calculation depends on the applicable agreement and
+        employment details.
       </p>
 
-      <label for="nightShifts">Night shifts worked</label>
-      <input id="nightShifts" type="number" min="0" step="1" value="0">
+      <label for="nightShifts">
+        Night shifts worked
+      </label>
+
+      <input
+        id="nightShifts"
+        type="number"
+        min="0"
+        step="1"
+        value="0"
+      >
 
       <label for="specialShifts">
         Qualifying allowance shifts
       </label>
-      <input id="specialShifts" type="number" min="0" step="1" value="0">
+
+      <input
+        id="specialShifts"
+        type="number"
+        min="0"
+        step="1"
+        value="0"
+      >
 
       <p class="help-text">
         Enter only shifts linked to a qualifying allowance, such as
@@ -109,13 +170,21 @@
       </p>
 
       <label class="checkbox-row">
-        <input id="cleaningAllowance" type="checkbox" checked>
-        <span>Include R32 monthly cleaning allowance</span>
+        <input
+          id="cleaningAllowance"
+          type="checkbox"
+          checked
+        >
+
+        <span>
+          Include R32 monthly cleaning allowance
+        </span>
       </label>
 
       <label for="actualPay">
-        Actual basic pay received
+        Actual basic pay received for this audit month
       </label>
+
       <input
         id="actualPay"
         type="number"
@@ -124,29 +193,59 @@
         placeholder="Example: 7000"
       >
 
+      <p class="help-text">
+        Enter the amount actually paid for the selected month. Keep the
+        payslip, bank record or payment message for verification.
+      </p>
+
       <button id="auditButton" type="button">
         Run wage audit
       </button>
 
-            <button
+      <button
         id="clearButton"
         type="button"
         class="secondary-button"
-        onclick="location.reload()"
       >
         Clear form
       </button>
     </section>
 
-    <section id="resultCard" class="card result-card hidden">
+    <section
+      id="resultCard"
+      class="card result-card hidden"
+    >
       <div class="result-header">
         <h2>Estimated result</h2>
-        <span id="resultStatus" class="status">Estimate</span>
+
+        <span
+          id="resultStatus"
+          class="status"
+        >
+          Preliminary estimate
+        </span>
       </div>
 
-      <p class="result-label">Possible estimated shortfall</p>
-      <div id="difference" class="main-amount">R 0,00</div>
-      <p id="resultMessage" class="result-message"></p>
+      <p class="result-label">
+        Preliminary possible difference
+      </p>
+
+      <div
+        id="difference"
+        class="main-amount"
+      >
+        R 0,00
+      </div>
+
+      <p
+        id="resultMessage"
+        class="result-message"
+      ></p>
+
+      <p
+        id="premiumWarning"
+        class="warning hidden"
+      ></p>
 
       <div class="calculation">
         <div class="calculation-row">
@@ -178,13 +277,30 @@
           <span>Actual pay entered</span>
           <strong id="actualPayResult">R 0,00</strong>
         </div>
+
+        <div class="calculation-row">
+          <span>Sunday hours requiring review</span>
+          <strong id="sundayHoursResult">0</strong>
+        </div>
+
+        <div class="calculation-row">
+          <span>Public-holiday hours requiring review</span>
+          <strong id="holidayHoursResult">0</strong>
+        </div>
       </div>
 
-      <button id="saveButton" type="button">
+      <button
+        id="saveButton"
+        type="button"
+      >
         Save locally on this device
       </button>
 
-      <button id="exportButton" type="button" class="secondary-button">
+      <button
+        id="exportButton"
+        type="button"
+        class="secondary-button"
+      >
         Export report as text
       </button>
     </section>
@@ -193,12 +309,52 @@
       <h2>Report a Site Concern</h2>
 
       <p class="help-text">
-        Use this section to record a possible wage or payroll problem at the
-        exact security worksite. This is for organised information and later
+        Use this section to record a possible wage or payroll problem at
+        the exact security worksite. This organises information for later
         verification. It does not automatically prove wrongdoing.
       </p>
 
-      <label for="siteName">Client or worksite name</label>
+      <label for="reporterMode">
+        Reporting preference
+      </label>
+
+      <select id="reporterMode">
+        <option value="anonymous">
+          Anonymous
+        </option>
+
+        <option value="confidential">
+          Confidential — identity shared only with authorised reviewers
+        </option>
+
+        <option value="identified">
+          Identified
+        </option>
+      </select>
+
+      <p class="help-text">
+        Anonymous means you do not provide your name or contact details.
+        This local prototype cannot guarantee technical anonymity from
+        hosting, browser or network records.
+      </p>
+
+      <label for="reporterLanguage">
+        Preferred language
+      </label>
+
+      <select id="reporterLanguage">
+        <option value="English">English</option>
+        <option value="isiZulu">isiZulu</option>
+        <option value="isiXhosa">isiXhosa</option>
+        <option value="Sesotho">Sesotho</option>
+        <option value="Setswana">Setswana</option>
+        <option value="Other">Other</option>
+      </select>
+
+      <label for="siteName">
+        Client or worksite name
+      </label>
+
       <input
         id="siteName"
         type="text"
@@ -206,7 +362,10 @@
         placeholder="Example: Byers CCID"
       >
 
-      <label for="siteAddress">Exact worksite address</label>
+      <label for="siteAddress">
+        Exact worksite address
+      </label>
+
       <textarea
         id="siteAddress"
         rows="3"
@@ -214,7 +373,10 @@
         placeholder="Enter the physical address of the site"
       ></textarea>
 
-      <label for="securityCompany">Security company</label>
+      <label for="securityCompany">
+        Security company
+      </label>
+
       <input
         id="securityCompany"
         type="text"
@@ -222,7 +384,10 @@
         placeholder="Company name, if known"
       >
 
-      <label for="guardsAffected">Number of guards affected</label>
+      <label for="guardsAffected">
+        Number of guards affected
+      </label>
+
       <input
         id="guardsAffected"
         type="number"
@@ -231,7 +396,10 @@
         placeholder="Example: 12"
       >
 
-      <label for="expectedPay">Expected monthly pay per guard</label>
+      <label for="expectedPay">
+        Expected monthly pay per guard
+      </label>
+
       <input
         id="expectedPay"
         type="number"
@@ -240,7 +408,10 @@
         placeholder="Optional"
       >
 
-      <label for="actualSitePay">Actual monthly pay per guard</label>
+      <label for="actualSitePay">
+        Actual monthly pay per guard
+      </label>
+
       <input
         id="actualSitePay"
         type="number"
@@ -249,7 +420,10 @@
         placeholder="Optional"
       >
 
-      <label for="siteConcern">What appears to require verification?</label>
+      <label for="siteConcern">
+        What appears to require verification?
+      </label>
+
       <textarea
         id="siteConcern"
         rows="5"
@@ -257,32 +431,175 @@
         placeholder="Describe the issue without entering ID numbers or bank details"
       ></textarea>
 
-      <button id="siteReportButton" type="button">
-        Create site report
+      <label for="documentsAvailable">
+        Documents currently available
+      </label>
+
+      <textarea
+        id="documentsAvailable"
+        rows="3"
+        maxlength="500"
+        placeholder="Example: bank SMS, roster, payslip, WhatsApp messages, or no documents"
+      ></textarea>
+
+      <label for="documentsMissing">
+        Documents not available
+      </label>
+
+      <textarea
+        id="documentsMissing"
+        rows="3"
+        maxlength="500"
+        placeholder="Example: employer keeps payslips or no written contract"
+      ></textarea>
+
+      <label for="reporterStatement">
+        Your statement
+      </label>
+
+      <textarea
+        id="reporterStatement"
+        rows="6"
+        maxlength="2000"
+        placeholder="Explain what happened in your own words. You may write in your preferred language."
+      ></textarea>
+
+      <label class="checkbox-row">
+        <input
+          id="confirmInformation"
+          type="checkbox"
+        >
+
+        <span>
+          I confirm that this report is based on information I believe
+          to be accurate.
+        </span>
+      </label>
+
+      <button
+        id="siteReportButton"
+        type="button"
+      >
+        Create case and evidence pack
       </button>
 
-      <div id="siteReportResult" class="success-message hidden"></div>
+      <div
+        id="siteReportResult"
+        class="success-message hidden"
+        role="status"
+        aria-live="polite"
+      ></div>
+
+      <button
+        id="printCaseButton"
+        type="button"
+        class="secondary-button hidden"
+      >
+        Print case pack
+      </button>
     </section>
+
+    <section class="card">
+      <h2>Check case status</h2>
+
+      <p class="help-text">
+        Enter your case number and private access code. Keep the access
+        code private. This local prototype can only find cases saved on
+        this same device and browser.
+      </p>
+
+      <label for="statusCaseNumber">
+        Case number
+      </label>
+
+      <input
+        id="statusCaseNumber"
+        type="text"
+        maxlength="40"
+        placeholder="Example: CL-2026-ABC123"
+      >
+
+      <label for="statusAccessCode">
+        Private access code
+      </label>
+
+      <input
+        id="statusAccessCode"
+        type="text"
+        maxlength="20"
+        placeholder="Enter your private access code"
+      >
+
+      <button
+        id="statusButton"
+        type="button"
+      >
+        Check status
+      </button>
+
+      <div
+        id="statusResult"
+        class="success-message hidden"
+        role="status"
+        aria-live="polite"
+      ></div>
+    </section>
+
+    <section
+      id="casePack"
+      class="card case-pack hidden"
+    >
+      <h2>Civic Ledger Wage Evidence Pack</h2>
+
+      <p class="help-text">
+        Keep this document and your supporting records. It is an
+        independent report and not an official finding.
+      </p>
+
+      <div id="casePackContent"></div>
+    </section>
+
     <section class="card">
       <h2>Privacy notice</h2>
+
       <p class="privacy-text">
         You do not need to enter your South African ID number or PSIRA
-        number. This pilot stores audit records only on this device when
-        you choose “Save locally”. Do not enter payslip images,
-        identity numbers, bank details or sensitive personal information.
+        number. This pilot stores audit and case records only on this
+        device when you choose to save or create a report. Do not enter
+        payslip images, identity numbers, bank details or passwords.
+      </p>
+
+      <p class="privacy-text">
+        This prototype does not send reports to government departments,
+        employers, unions, bargaining councils or inspectors. A future
+        secure version will require a protected database and authorised
+        access system.
       </p>
 
       <label class="checkbox-row">
-        <input id="feedbackConsent" type="checkbox">
-        <span>I agree to be contacted about pilot feedback.</span>
+        <input
+          id="feedbackConsent"
+          type="checkbox"
+        >
+
+        <span>
+          I agree to be contacted about pilot feedback.
+        </span>
       </label>
 
-      <div id="savedMessage" class="success-message hidden"></div>
+      <div
+        id="savedMessage"
+        class="success-message hidden"
+        role="status"
+        aria-live="polite"
+      ></div>
     </section>
 
     <footer class="app-footer">
-      <p>Civic Ledger Pilot v1.0</p>
-      <p>Reference period: 1 March 2026 – 28 February 2027</p>
+      <p>Civic Ledger Pilot v1.1</p>
+      <p>
+        Reference period: 1 March 2026 – 28 February 2027
+      </p>
     </footer>
 
   </main>
