@@ -1,40 +1,33 @@
-document.addEventListener("DOMContentLoaded", function () {
-  const workerName = document.getElementById("workerName");
-  const area = document.getElementById("area");
-  const grade = document.getElementById("grade");
-  const auditMonth = document.getElementById("auditMonth");
+document.addEventListener("DOMContentLoaded", () => {
+  const $ = (id) => document.getElementById(id);
 
-  const ordinaryShifts = document.getElementById("ordinaryShifts");
-  const sundayHours = document.getElementById("sundayHours");
-  const holidayHours = document.getElementById("holidayHours");
-  const nightShifts = document.getElementById("nightShifts");
-  const specialShifts = document.getElementById("specialShifts");
-  const cleaningAllowance = document.getElementById("cleaningAllowance");
-  const actualPay = document.getElementById("actualPay");
-  const feedbackConsent = document.getElementById("feedbackConsent");
+  const workerName = $("workerName");
+  const area = $("area");
+  const grade = $("grade");
+  const auditMonth = $("auditMonth");
+  const ordinaryShifts = $("ordinaryShifts");
+  const sundayHours = $("sundayHours");
+  const holidayHours = $("holidayHours");
+  const nightShifts = $("nightShifts");
+  const specialShifts = $("specialShifts");
+  const cleaningAllowance = $("cleaningAllowance");
+  const actualPay = $("actualPay");
+  const feedbackConsent = $("feedbackConsent");
 
-  const auditButton = document.getElementById("auditButton");
-  const clearButton = document.getElementById("clearButton");
-  const saveButton = document.getElementById("saveButton");
-  const exportButton = document.getElementById("exportButton");
+  const resultCard = $("resultCard");
+  const resultStatus = $("resultStatus");
+  const difference = $("difference");
+  const resultMessage = $("resultMessage");
+  const minimumWage = $("minimumWage");
+  const nightAmount = $("nightAmount");
+  const specialAmount = $("specialAmount");
+  const cleaningAmount = $("cleaningAmount");
+  const estimatedTotal = $("estimatedTotal");
+  const actualPayResult = $("actualPayResult");
+  const savedMessage = $("savedMessage");
 
-  const resultCard = document.getElementById("resultCard");
-  const resultStatus = document.getElementById("resultStatus");
-  const difference = document.getElementById("difference");
-  const resultMessage = document.getElementById("resultMessage");
-  const minimumWage = document.getElementById("minimumWage");
-  const nightAmount = document.getElementById("nightAmount");
-  const specialAmount = document.getElementById("specialAmount");
-  const cleaningAmount = document.getElementById("cleaningAmount");
-  const estimatedTotal = document.getElementById("estimatedTotal");
-  const actualPayResult = document.getElementById("actualPayResult");
-  const savedMessage = document.getElementById("savedMessage");
+  const siteReportResult = $("siteReportResult");
 
-  const siteReportButton =
-    document.getElementById("siteReportButton");
-
-  const siteReportResult =
-    document.getElementById("siteReportResult");
   const rates = {
     area12: {
       A: 7350,
@@ -56,18 +49,52 @@ document.addEventListener("DOMContentLoaded", function () {
   const SPECIAL_ALLOWANCE_PER_SHIFT = 10.5;
   const CLEANING_ALLOWANCE = 32;
 
+  let latestAudit = null;
+  let latestCase = null;
+
   function money(value) {
-    return "R " + Number(value).toLocaleString("en-ZA", {
+    return "R " + Number(value || 0).toLocaleString("en-ZA", {
       minimumFractionDigits: 2,
       maximumFractionDigits: 2
     });
   }
 
   function numberValue(input) {
-    return Number(input.value) || 0;
+    return Number(input?.value) || 0;
   }
 
-  function calculateAudit() {
+  function secureCode(length = 8) {
+    const alphabet = "ABCDEFGHJKLMNPQRSTUVWXYZ23456789";
+    const values = new Uint32Array(length);
+
+    if (window.crypto?.getRandomValues) {
+      window.crypto.getRandomValues(values);
+    } else {
+      for (let i = 0; i < length; i += 1) {
+        values[i] = Math.floor(Math.random() * 4294967295);
+      }
+    }
+
+    return Array.from(values, (value) => {
+      return alphabet[value % alphabet.length];
+    }).join("");
+  }
+
+  function createCaseNumber() {
+    const year = new Date().getFullYear();
+    return `CL-${year}-${secureCode(6)}`;
+  }
+
+  function escapeHtml(value) {
+    return String(value ?? "")
+      .replace(/&/g, "&amp;")
+      .replace(/</g, "&lt;")
+      .replace(/>/g, "&gt;")
+      .replace(/"/g, "&quot;")
+      .replace(/'/g, "&#039;");
+  }
+
+  function calculateValues() {
     const baseWage = rates[area.value][grade.value];
 
     const nightTotal =
@@ -86,63 +113,89 @@ document.addEventListener("DOMContentLoaded", function () {
     const receivedPay = numberValue(actualPay);
     const shortfall = Math.max(referenceTotal - receivedPay, 0);
 
-    minimumWage.textContent = money(baseWage);
-    nightAmount.textContent = money(nightTotal);
-    specialAmount.textContent = money(specialTotal);
-    cleaningAmount.textContent = money(cleaningTotal);
-    estimatedTotal.textContent = money(referenceTotal);
-    actualPayResult.textContent = money(receivedPay);
-    difference.textContent = money(shortfall);
+    return {
+      baseWage,
+      nightTotal,
+      specialTotal,
+      cleaningTotal,
+      referenceTotal,
+      receivedPay,
+      shortfall,
+      sundayHours: numberValue(sundayHours),
+      holidayHours: numberValue(holidayHours)
+    };
+  }
+
+  function calculateAudit() {
+    const values = calculateValues();
+
+    minimumWage.textContent = money(values.baseWage);
+    nightAmount.textContent = money(values.nightTotal);
+    specialAmount.textContent = money(values.specialTotal);
+    cleaningAmount.textContent = money(values.cleaningTotal);
+    estimatedTotal.textContent = money(values.referenceTotal);
+    actualPayResult.textContent = money(values.receivedPay);
+    difference.textContent = money(values.shortfall);
 
     resultStatus.textContent =
-      shortfall > 0 ? "Estimate" : "No difference";
+      values.shortfall > 0
+        ? "Preliminary estimate"
+        : "No difference";
 
-    resultMessage.textContent =
-      shortfall > 0
-        ? "This estimate shows a possible difference. Keep your payslip and work records for verification."
-        : "No difference was identified using the information entered. Keep your payslip and work records for verification.";
+    let message = values.shortfall > 0
+      ? "This is a preliminary possible difference. Keep payslips, rosters and payment records for verification."
+      : "No difference was identified using the information entered. Keep your records for verification.";
 
-    resultCard.classList.remove("hidden");
-  }
+    if (values.sundayHours > 0 || values.holidayHours > 0) {
+      message += " Sunday or public-holiday hours were entered but are not included in this preliminary calculation.";
+    }
 
-  function clearAudit() {
-    workerName.value = "";
-    area.value = "area12";
-    grade.value = "C";
-    auditMonth.value = "";
-    ordinaryShifts.value = "16";
-    sundayHours.value = "0";
-    holidayHours.value = "0";
-    nightShifts.value = "0";
-    specialShifts.value = "0";
-    cleaningAllowance.checked = true;
-    actualPay.value = "";
-    feedbackConsent.checked = false;
+    resultMessage.textContent = message;
 
-    resultCard.classList.add("hidden");
-    resultMessage.textContent = "";
-    savedMessage.textContent = "";
-    savedMessage.classList.add("hidden");
-  }
+    const premiumWarning = $("premiumWarning");
 
-  function getAuditRecord() {
-    return {
-      createdAt: new Date().toISOString(),
+    if (premiumWarning) {
+      if (values.sundayHours > 0 || values.holidayHours > 0) {
+        premiumWarning.textContent =
+          "Review required: Sunday/public-holiday hours may change the final amount. The applicable agreement, roster and shift pattern must be checked.";
+        premiumWarning.classList.remove("hidden");
+      } else {
+        premiumWarning.textContent = "";
+        premiumWarning.classList.add("hidden");
+      }
+    }
+
+    if ($("sundayHoursResult")) {
+      $("sundayHoursResult").textContent = values.sundayHours;
+    }
+
+    if ($("holidayHoursResult")) {
+      $("holidayHoursResult").textContent = values.holidayHours;
+    }
+
+    latestAudit = {
+      ...values,
       workerName: workerName.value.trim(),
       area: area.value,
       grade: grade.value,
       auditMonth: auditMonth.value,
       ordinaryShifts: numberValue(ordinaryShifts),
-      sundayHours: numberValue(sundayHours),
-      holidayHours: numberValue(holidayHours),
       nightShifts: numberValue(nightShifts),
       specialShifts: numberValue(specialShifts),
       cleaningAllowance: cleaningAllowance.checked,
-      actualPay: numberValue(actualPay),
       feedbackConsent: feedbackConsent.checked,
-      estimatedReferenceTotal: estimatedTotal.textContent,
-      estimatedShortfall: difference.textContent
+      createdAt: new Date().toISOString()
     };
+
+    resultCard.classList.remove("hidden");
+  }
+
+  function getAuditRecord() {
+    if (!latestAudit) {
+      calculateAudit();
+    }
+
+    return latestAudit;
   }
 
   function saveAudit() {
@@ -159,106 +212,408 @@ document.addEventListener("DOMContentLoaded", function () {
     savedMessage.classList.remove("hidden");
   }
 
-  
-  function exportAudit() {
-    const record = getAuditRecord();
-
-    const report = [
-      "Civic Ledger Wage Audit",
-      "Audit month: " + (record.auditMonth || "Not entered"),
-      "Wage area: " + record.area,
-      "Security grade: " + record.grade,
-      "Ordinary shifts: " + record.ordinaryShifts,
-      "Sunday hours: " + record.sundayHours,
-      "Public-holiday hours: " + record.holidayHours,
-      "Night shifts: " + record.nightShifts,
-      "Qualifying allowance shifts: " + record.specialShifts,
-      "Actual pay: " + money(record.actualPay),
-      "Estimated reference total: " + record.estimatedReferenceTotal,
-      "Possible estimated shortfall: " + record.estimatedShortfall,
-      "This is an independent estimate and must be checked against payslips, contracts, rosters and the applicable agreement."
-    ].join(" | ");
-
-    const blob = new Blob([report], {
-      type: "text/plain"
+  function downloadText(text, filename) {
+    const blob = new Blob([text], {
+      type: "text/plain;charset=utf-8"
     });
 
     const url = URL.createObjectURL(blob);
     const link = document.createElement("a");
 
     link.href = url;
-    link.download = "civic-ledger-wage-audit.txt";
+    link.download = filename;
     document.body.appendChild(link);
     link.click();
     link.remove();
 
-    URL.revokeObjectURL(url);
+    setTimeout(() => {
+      URL.revokeObjectURL(url);
+    }, 1000);
   }
 
-    function createSiteReport() {
-    const siteName = document.getElementById("siteName").value.trim();
-    const siteAddress = document.getElementById("siteAddress").value.trim();
-    const securityCompany = document.getElementById("securityCompany").value.trim();
-    const guardsAffected =
-      Number(document.getElementById("guardsAffected").value) || 0;
-    const expectedPay =
-      Number(document.getElementById("expectedPay").value) || 0;
-    const actualSitePay =
-      Number(document.getElementById("actualSitePay").value) || 0;
-    const siteConcern =
-      document.getElementById("siteConcern").value.trim();
+  function exportAudit() {
+    const record = getAuditRecord();
+
+    const report = [
+      "CIVIC LEDGER PRELIMINARY WAGE AUDIT",
+      "",
+      `Audit month: ${record.auditMonth || "Not entered"}`,
+      `Wage area: ${record.area}`,
+      `Security grade: ${record.grade}`,
+      `Ordinary shifts: ${record.ordinaryShifts}`,
+      `Sunday hours requiring review: ${record.sundayHours}`,
+      `Public-holiday hours requiring review: ${record.holidayHours}`,
+      `Night shifts: ${record.nightShifts}`,
+      `Qualifying allowance shifts: ${record.specialShifts}`,
+      `Actual pay: ${money(record.receivedPay)}`,
+      `Estimated reference total: ${money(record.referenceTotal)}`,
+      `Preliminary possible difference: ${money(record.shortfall)}`,
+      "",
+      "This is an independent estimate, not an official determination.",
+      "Verify against payslips, contracts, rosters, the applicable agreement and payroll records."
+    ].join("
+");
+
+    downloadText(
+      report,
+      `civic-ledger-wage-audit-${record.auditMonth || "report"}.txt`
+    );
+  }
+
+  function createSiteReport() {
+    const siteName = $("siteName").value.trim();
+    const siteAddress = $("siteAddress").value.trim();
+    const securityCompany = $("securityCompany").value.trim();
+    const guardsAffected = Number($("guardsAffected").value) || 0;
+    const expectedPay = Number($("expectedPay").value) || 0;
+    const actualSitePay = Number($("actualSitePay").value) || 0;
+    const siteConcern = $("siteConcern").value.trim();
+
+    const reporterMode =
+      $("reporterMode")?.value || "anonymous";
+
+    const reporterLanguage =
+      $("reporterLanguage")?.value || "English";
+
+    const documentsAvailable =
+      $("documentsAvailable")?.value.trim() || "";
+
+    const documentsMissing =
+      $("documentsMissing")?.value.trim() || "";
+
+    const reporterStatement =
+      $("reporterStatement")?.value.trim() || "";
+
+    const confirmInformation =
+      $("confirmInformation")?.checked || false;
 
     if (
       !siteName ||
       !siteAddress ||
       !securityCompany ||
       guardsAffected < 1 ||
-      !siteConcern
+      !siteConcern ||
+      !confirmInformation
     ) {
       siteReportResult.textContent =
-        "Please complete the worksite, address, company, affected-guard number and concern fields.";
+        "Complete the worksite, address, company, affected-guard number, concern and confirmation fields.";
+
       siteReportResult.classList.remove("hidden");
       return;
     }
 
-        const now = new Date();
-
-    const caseNumber =
-      "CL-SITE-" +
-      now.getTime();
+    const audit = latestAudit || calculateValues();
+    const caseNumber = createCaseNumber();
+    const accessCode = secureCode(10);
+    const now = new Date().toISOString();
 
     const estimatedShortfall =
       Math.max(expectedPay - actualSitePay, 0) * guardsAffected;
 
-    const report = {
-      caseNumber: caseNumber,
-      createdAt: new Date().toISOString(),
-      siteName: siteName,
-      siteAddress: siteAddress,
-      securityCompany: securityCompany,
-      guardsAffected: guardsAffected,
-      expectedPay: expectedPay,
-      actualSitePay: actualSitePay,
-      estimatedShortfall: estimatedShortfall,
-      siteConcern: siteConcern
+    latestCase = {
+      caseNumber,
+      accessCode,
+      createdAt: now,
+      status: "Submitted",
+      lastUpdated: now,
+      siteName,
+      siteAddress,
+      securityCompany,
+      guardsAffected,
+      expectedPay,
+      actualSitePay,
+      estimatedShortfall,
+      siteConcern,
+      reporterMode,
+      reporterLanguage,
+      documentsAvailable,
+      documentsMissing,
+      reporterStatement,
+      audit
     };
 
     localStorage.setItem(
-      "civicLedgerLastSiteReport",
-      JSON.stringify(report)
+      `civicLedgerCase:${caseNumber}`,
+      JSON.stringify(latestCase)
     );
 
-    siteReportResult.textContent =
-      "Report created locally. Case number: " +
-      caseNumber +
-      ". It has not been sent to inspectors.";
+    localStorage.setItem(
+      "civicLedgerLastCase",
+      JSON.stringify(latestCase)
+    );
 
-    siteReportResult.classList.remove("hidden");
+    showCaseResult(latestCase);
   }
 
-  auditButton.addEventListener("click", calculateAudit);
-  clearButton.addEventListener("click", clearAudit);
-  saveButton.addEventListener("click", saveAudit);
-  exportButton.addEventListener("click", exportAudit);
-  siteReportButton.addEventListener("click", createSiteReport);
+  function showCaseResult(caseData) {
+    siteReportResult.innerHTML = `
+      <div class="case-result">
+        <div class="case-number">
+          Case number: ${escapeHtml(caseData.caseNumber)}
+        </div>
+
+        <p>
+          <strong>Private access code:</strong>
+          <span class="access-code">
+            ${escapeHtml(caseData.accessCode)}
+          </span>
+        </p>
+
+        <p>
+          <strong>Status:</strong>
+          Submitted
+        </p>
+
+        <p>
+          Saved locally on this device. It has not been sent to inspectors.
+        </p>
+      </div>
+    `;
+
+    siteReportResult.classList.remove("hidden");
+
+    const printButton = $("printCaseButton");
+
+    if (printButton) {
+      printButton.classList.remove("hidden");
+    }
+
+    buildCasePack(caseData);
+  }
+
+  function buildCasePack(caseData) {
+    const casePack = $("casePack");
+    const casePackContent = $("casePackContent");
+
+    if (!casePack || !casePackContent) {
+      return;
+    }
+
+    const audit = caseData.audit || {};
+
+    casePackContent.innerHTML = `
+      <div class="print-row">
+        <span class="print-label">Case number</span>
+        <span>${escapeHtml(caseData.caseNumber)}</span>
+      </div>
+
+      <div class="print-row">
+        <span class="print-label">Private access code</span>
+        <span>${escapeHtml(caseData.accessCode)}</span>
+      </div>
+
+      <div class="print-row">
+        <span class="print-label">Status</span>
+        <span>${escapeHtml(caseData.status)}</span>
+      </div>
+
+      <div class="print-row">
+        <span class="print-label">Submitted</span>
+        <span>${escapeHtml(new Date(caseData.createdAt).toLocaleString("en-ZA"))}</span>
+      </div>
+
+      <div class="print-row">
+        <span class="print-label">Reporting preference</span>
+        <span>${escapeHtml(caseData.reporterMode)}</span>
+      </div>
+
+      <div class="print-row">
+        <span class="print-label">Preferred language</span>
+        <span>${escapeHtml(caseData.reporterLanguage)}</span>
+      </div>
+
+      <div class="print-row">
+        <span class="print-label">Site</span>
+        <span>${escapeHtml(caseData.siteName)}</span>
+      </div>
+
+      <div class="print-row">
+        <span class="print-label">Address</span>
+        <span>${escapeHtml(caseData.siteAddress)}</span>
+      </div>
+
+      <div class="print-row">
+        <span class="print-label">Security company</span>
+        <span>${escapeHtml(caseData.securityCompany)}</span>
+      </div>
+
+      <div class="print-row">
+        <span class="print-label">Guards affected</span>
+        <span>${caseData.guardsAffected}</span>
+      </div>
+
+      <div class="print-row">
+        <span class="print-label">Complaint</span>
+        <span>${escapeHtml(caseData.siteConcern)}</span>
+      </div>
+
+      <div class="print-row">
+        <span class="print-label">Preliminary wage difference</span>
+        <span>${money(audit.shortfall || 0)}</span>
+      </div>
+
+      <div class="print-row">
+        <span class="print-label">Sunday hours requiring review</span>
+        <span>${audit.sundayHours || 0}</span>
+      </div>
+
+      <div class="print-row">
+        <span class="print-label">Public-holiday hours requiring review</span>
+        <span>${audit.holidayHours || 0}</span>
+      </div>
+
+      <h3>Evidence available</h3>
+      <p>${escapeHtml(caseData.documentsAvailable || "Not specified")}</p>
+
+      <h3>Evidence missing</h3>
+      <p>${escapeHtml(caseData.documentsMissing || "Not specified")}</p>
+
+      <h3>Reporter statement</h3>
+      <p>${escapeHtml(caseData.reporterStatement || "Not provided")}</p>
+
+      <p class="help-text">
+        This document records information supplied by the reporter.
+        It is not an official finding. Verification requires payroll,
+        roster, contract and payment records.
+      </p>
+
+      <h3>Official follow-up</h3>
+      <p>Department reference: ______________________________</p>
+      <p>Official name and signature: _________________________</p>
+      <p>Date and stamp: _____________________________________</p>
+    `;
+
+    casePack.classList.remove("hidden");
+  }
+
+  function checkStatus() {
+    const caseNumber = $("statusCaseNumber")?.value.trim();
+    const accessCode = $("statusAccessCode")?.value.trim();
+    const statusResult = $("statusResult");
+
+    if (!caseNumber || !accessCode) {
+      statusResult.textContent =
+        "Enter both the case number and private access code.";
+
+      statusResult.classList.remove("hidden");
+      return;
+    }
+
+    const stored = localStorage.getItem(
+      `civicLedgerCase:${caseNumber}`
+    );
+
+    if (!stored) {
+      statusResult.textContent =
+        "No case was found on this device.";
+
+      statusResult.classList.remove("hidden");
+      return;
+    }
+
+    let caseData;
+
+    try {
+      caseData = JSON.parse(stored);
+    } catch (error) {
+      statusResult.textContent =
+        "This case record could not be read.";
+
+      statusResult.classList.remove("hidden");
+      return;
+    }
+
+    if (caseData.accessCode !== accessCode) {
+      statusResult.textContent =
+        "The case number or private access code is incorrect.";
+
+      statusResult.classList.remove("hidden");
+      return;
+    }
+
+    statusResult.innerHTML = `
+      <div class="case-result">
+        <strong>${escapeHtml(caseData.caseNumber)}</strong>
+
+        <p>
+          Status: ${escapeHtml(caseData.status)}
+        </p>
+
+        <p>
+          Last updated:
+          ${escapeHtml(new Date(caseData.lastUpdated).toLocaleString("en-ZA"))}
+        </p>
+
+        <p>
+          No departmental action can be confirmed by this local prototype.
+        </p>
+      </div>
+    `;
+
+    statusResult.classList.remove("hidden");
+  }
+
+  function printCasePack() {
+    const casePack = $("casePack");
+
+    if (
+      !casePack ||
+      casePack.classList.contains("hidden")
+    ) {
+      return;
+    }
+
+    window.print();
+  }
+
+  function clearAudit() {
+    window.location.reload();
+  }
+
+  $("auditButton")?.addEventListener(
+    "click",
+    calculateAudit
+  );
+
+  $("clearButton")?.addEventListener(
+    "click",
+    clearAudit
+  );
+
+  $("saveButton")?.addEventListener(
+    "click",
+    saveAudit
+  );
+
+  $("exportButton")?.addEventListener(
+    "click",
+    exportAudit
+  );
+
+  $("siteReportButton")?.addEventListener(
+    "click",
+    createSiteReport
+  );
+
+  $("statusButton")?.addEventListener(
+    "click",
+    checkStatus
+  );
+
+  $("printCaseButton")?.addEventListener(
+    "click",
+    printCasePack
+  );
+
+  if ("serviceWorker" in navigator) {
+    window.addEventListener("load", () => {
+      navigator.serviceWorker.register("./service-worker.js")
+        .catch((error) => {
+          console.error(
+            "Service worker registration failed:",
+            error
+          );
+        });
+    });
+  }
 });
