@@ -1,0 +1,103 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="theme-color" content="#0f172a">
+  <meta name="description" content="Weather Dashboard - Real-time weather information">
+  <title>Weather Dashboard</title>
+  <link rel="stylesheet" href="weather-style.css">
+</head>
+<body>
+  <main class="weather-app">
+    <header class="weather-header">
+      <h1>🌤️ Weather Dashboard</h1>
+      <p>Real-time weather information for your location</p>
+    </header>
+
+    <section class="search-section">
+      <div class="search-container">
+        <input 
+          type="text" 
+          id="cityInput" 
+          placeholder="Enter city name..."
+          class="city-search"
+        >
+        <button id="searchBtn" class="search-btn">Search</button>
+        <button id="locationBtn" class="location-btn">📍 Use My Location</button>
+      </div>
+      <div id="errorMessage" class="error-message hidden"></div>
+    </section>
+
+    <section id="weatherCard" class="weather-card hidden">
+      <div class="weather-header-card">
+        <div class="city-info">
+          <h2 id="cityName">Loading...</h2>
+          <p id="weatherDescription">Loading...</p>
+        </div>
+        <div class="weather-temp">
+          <span id="temperature" class="main-temp">--°C</span>
+          <img id="weatherIcon" src="" alt="Weather icon" class="weather-icon">
+        </div>
+      </div>
+
+      <div class="weather-details">
+        <div class="detail-box">
+          <span class="detail-label">Feels Like</span>
+          <span id="feelsLike" class="detail-value">--°C</span>
+        </div>
+        <div class="detail-box">
+          <span class="detail-label">Humidity</span>
+          <span id="humidity" class="detail-value">--%</span>
+        </div>
+        <div class="detail-box">
+          <span class="detail-label">Wind Speed</span>
+          <span id="windSpeed" class="detail-value">-- km/h</span>
+        </div>
+        <div class="detail-box">
+          <span class="detail-label">Pressure</span>
+          <span id="pressure" class="detail-value">-- hPa</span>
+        </div>
+        <div class="detail-box">
+          <span class="detail-label">UV Index</span>
+          <span id="uvIndex" class="detail-value">--</span>
+        </div>
+        <div class="detail-box">
+          <span class="detail-label">Visibility</span>
+          <span id="visibility" class="detail-value">-- km</span>
+        </div>
+      </div>
+
+      <div class="forecast-section">
+        <h3>5-Day Forecast</h3>
+        <div id="forecastContainer" class="forecast-container"></div>
+      </div>
+
+      <div class="sun-info">
+        <div class="sun-time">
+          <span class="sun-label">🌅 Sunrise</span>
+          <span id="sunrise" class="sun-value">--:--</span>
+        </div>
+        <div class="sun-time">
+          <span class="sun-label">🌇 Sunset</span>
+          <span id="sunset" class="sun-value">--:--</span>
+        </div>
+      </div>
+
+      <button id="refreshBtn" class="refresh-btn">🔄 Refresh</button>
+    </section>
+
+    <section class="info-section">
+      <h3>ℹ️ About This Dashboard</h3>
+      <p>This weather dashboard uses the <strong>OpenWeatherMap API</strong> to provide real-time weather data. Enter a city name or use your device's location to get current weather conditions, a 5-day forecast, and detailed meteorological information.</p>
+      <p><strong>Note:</strong> To use this feature, you'll need to:</p>
+      <ol>
+        <li>Get a free API key from <a href="https://openweathermap.org/api" target="_blank">OpenWeatherMap</a></li>
+        <li>Replace the API key in the JavaScript file</li>
+      </ol>
+    </section>
+  </main>
+
+  <script src="weather.js"></script>
+</body>
+</html>
