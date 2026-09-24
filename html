@@ -17,11 +17,26 @@
 
   <link rel="stylesheet" href="style.css">
   <link rel="manifest" href="manifest.json">
-  <link rel="icon" href="icon-192x192.png" type="image/png">
-</head>
+  <link rel="icon" href="Icon-192.png" type="image/png">
 
 <body>
   <main class="app-shell">
+    <div
+  id="notificationPanel"
+  class="notification-panel hidden"
+  role="status"
+  aria-live="polite"
+>
+  <span id="notificationMessage"></span>
+
+  <button
+    id="closeNotificationButton"
+    type="button"
+    aria-label="Close notification"
+  >
+    ×
+  </button>
+</div>
 
     <header class="app-header">
       <div class="logo">CL</div>
@@ -97,8 +112,8 @@
       <h2>Work and payment information</h2>
 
       <label for="ordinaryShifts">
-        Ordinary shifts worked — 12-hour units
-      </label>
+  Ordinary shifts entered — 12-hour units
+</label>
 
       <input
         id="ordinaryShifts"
@@ -172,12 +187,25 @@
       <label class="checkbox-row">
         <input
           id="cleaningAllowance"
-          type="checkbox"
+          type="checkbox" <label class="checkbox-row">
+  <input
+    id="transferAllowance"
+    type="checkbox"
+  >
+
+  <span>
+    Include R100 transfer allowance — only if transferred more than 60 km
+  </span>
+</label>
           checked
         >
 
         <span>
-          Include R32 monthly cleaning allowance
+          Include R32 monthly cleaning allowance 
+          <div class="calculation-row">
+  <span>Transfer allowance</span>
+  <strong id="transferAmount">R 0,00</strong>
+</div>
         </span>
       </label>
 
@@ -319,17 +347,13 @@
       </label>
 
       <select id="reporterMode">
-        <option value="anonymous">
-          Anonymous
-        </option>
+        <option value="anonymous-local">
+  No name entered — local device record
+</option>
 
-        <option value="confidential">
-          Confidential — identity shared only with authorised reviewers
-        </option>
-
-        <option value="identified">
-          Identified
-        </option>
+<option value="identified-local">
+  Name or reference entered — local device record
+</option>
       </select>
 
       <p class="help-text">
@@ -480,7 +504,7 @@
         id="siteReportButton"
         type="button"
       >
-        Create case and evidence pack
+        Create local record and evidence pack
       </button>
 
       <div
@@ -500,12 +524,12 @@
     </section>
 
     <section class="card">
-      <h2>Check case status</h2>
+      <h2>Find local case record</h2>
 
       <p class="help-text">
-        Enter your case number and private access code. Keep the access
-        code private. This local prototype can only find cases saved on
-        this same device and browser.
+        Enter the local case number and private access code. Keep the access
+code private. This prototype can find only records created in this
+same browser on this same device.
       </p>
 
       <label for="statusCaseNumber">
@@ -595,12 +619,12 @@
       ></div>
     </section>
 
-    <footer class="app-footer">
-      <p>Civic Ledger Pilot v1.1</p>
-      <p>
-        Reference period: 1 March 2026 – 28 February 2027
-      </p>
-    </footer>
+    <<footer class="app-footer">
+  <p>Civic Ledger Pilot v1.2</p>
+  <p>Reference period: 1 March 2026 – 28 February 2027</p>
+  <p>Independent estimate only — verify against the applicable agreement and payroll records.</p>
+</footer>
+      
 
   </main>
 
