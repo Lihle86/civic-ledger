@@ -11,6 +11,7 @@ document.addEventListener("DOMContentLoaded", () => {
   const nightShifts = $("nightShifts");
   const specialShifts = $("specialShifts");
   const cleaningAllowance = $("cleaningAllowance");
+  const transferAllowance = $("transferAllowance");
   const actualPay = $("actualPay");
   const feedbackConsent = $("feedbackConsent");
 
@@ -22,32 +23,38 @@ document.addEventListener("DOMContentLoaded", () => {
   const nightAmount = $("nightAmount");
   const specialAmount = $("specialAmount");
   const cleaningAmount = $("cleaningAmount");
+  const transferAmount = $("transferAmount");
   const estimatedTotal = $("estimatedTotal");
   const actualPayResult = $("actualPayResult");
   const savedMessage = $("savedMessage");
 
   const siteReportResult = $("siteReportResult");
 
+  const notificationPanel = $("notificationPanel");
+  const notificationMessage = $("notificationMessage");
+  const closeNotificationButton = $("closeNotificationButton");
+
   const rates = {
     area12: {
-      A: 7350,
-      B: 7165,
+      A: 8184,
+      B: 7607,
       C: 7003,
-      D: 6840,
-      E: 6660
+      D: 7003,
+      E: 7003
     },
     area3: {
-      A: 6860,
-      B: 6680,
-      C: 6500,
-      D: 6320,
-      E: 6150
+      A: 7142,
+      B: 6726,
+      C: 6726,
+      D: 6726,
+      E: 6726
     }
   };
 
   const NIGHT_ALLOWANCE_PER_SHIFT = 8;
   const SPECIAL_ALLOWANCE_PER_SHIFT = 10.5;
   const CLEANING_ALLOWANCE = 32;
+  const TRANSFER_ALLOWANCE = 100;
 
   let latestAudit = null;
   let latestCase = null;
@@ -60,7 +67,40 @@ document.addEventListener("DOMContentLoaded", () => {
   }
 
   function numberValue(input) {
-    return Number(input?.value) || 0;
+    const value = Number(input?.value);
+
+    if (!Number.isFinite(value) || value < 0) {
+      return 0;
+    }
+
+    return value;
+  }
+
+  function setDefaultAuditMonth() {
+    if (auditMonth && !auditMonth.value) {
+      const now = new Date();
+      const year = now.getFullYear();
+      const month = String(now.getMonth() + 1).padStart(2, "0");
+
+      auditMonth.value = `${year}-${month}`;
+    }
+  }
+
+  function showNotification(message, type = "info") {
+    if (!notificationPanel || !notificationMessage) {
+      return;
+    }
+
+    notificationPanel.className = "notification-panel";
+    notificationPanel.classList.add(type);
+    notificationMessage.textContent = message;
+    notificationPanel.classList.remove("hidden");
+  }
+
+  function hideNotification() {
+    if (notificationPanel) {
+      notificationPanel.classList.add("hidden");
+    }
   }
 
   function secureCode(length = 8) {
@@ -95,7 +135,11 @@ document.addEventListener("DOMContentLoaded", () => {
   }
 
   function calculateValues() {
-    const baseWage = rates[area.value][grade.value];
+    const selectedArea = area?.value || "area12";
+    const selectedGrade = grade?.value || "C";
+
+    const baseWage =
+      rates[selectedArea]?.[selectedGrade] || 0;
 
     const nightTotal =
       numberValue(nightShifts) * NIGHT_ALLOWANCE_PER_SHIFT;
@@ -103,12 +147,20 @@ document.addEventListener("DOMContentLoaded", () => {
     const specialTotal =
       numberValue(specialShifts) * SPECIAL_ALLOWANCE_PER_SHIFT;
 
-    const cleaningTotal = cleaningAllowance.checked
+    const cleaningTotal = cleaningAllowance?.checked
       ? CLEANING_ALLOWANCE
       : 0;
 
+    const transferTotal = transferAllowance?.checked
+      ? TRANSFER_ALLOWANCE
+      : 0;
+
     const referenceTotal =
-      baseWage + nightTotal + specialTotal + cleaningTotal;
+      baseWage +
+      nightTotal +
+      specialTotal +
+      cleaningTotal +
+      transferTotal;
 
     const receivedPay = numberValue(actualPay);
     const shortfall = Math.max(referenceTotal - receivedPay, 0);
@@ -118,6 +170,7 @@ document.addEventListener("DOMContentLoaded", () => {
       nightTotal,
       specialTotal,
       cleaningTotal,
+      transferTotal,
       referenceTotal,
       receivedPay,
       shortfall,
@@ -133,6 +186,11 @@ document.addEventListener("DOMContentLoaded", () => {
     nightAmount.textContent = money(values.nightTotal);
     specialAmount.textContent = money(values.specialTotal);
     cleaningAmount.textContent = money(values.cleaningTotal);
+
+    if (transferAmount) {
+      transferAmount.textContent = money(values.transferTotal);
+    }
+
     estimatedTotal.textContent = money(values.referenceTotal);
     actualPayResult.textContent = money(values.receivedPay);
     difference.textContent = money(values.shortfall);
@@ -140,11 +198,15 @@ document.addEventListener("DOMContentLoaded", () => {
     resultStatus.textContent =
       values.shortfall > 0
         ? "Preliminary estimate"
-        : "No difference";
+        : "No difference found";
 
     let message = values.shortfall > 0
       ? "This is a preliminary possible difference. Keep payslips, rosters and payment records for verification."
       : "No difference was identified using the information entered. Keep your records for verification.";
+
+    if (numberValue(ordinaryShifts) !== 16) {
+      message += " The ordinary-shift figure differs from the default full-month 16-shift example, so the monthly result requires verification against the roster and agreement.";
+    }
 
     if (values.sundayHours > 0 || values.holidayHours > 0) {
       message += " Sunday or public-holiday hours were entered but are not included in this preliminary calculation.";
@@ -157,7 +219,8 @@ document.addEventListener("DOMContentLoaded", () => {
     if (premiumWarning) {
       if (values.sundayHours > 0 || values.holidayHours > 0) {
         premiumWarning.textContent =
-          "Review required: Sunday/public-holiday hours may change the final amount. The applicable agreement, roster and shift pattern must be checked.";
+          "Review required: Sunday or public-holiday hours may change the final amount. Check the applicable agreement, roster and shift pattern.";
+
         premiumWarning.classList.remove("hidden");
       } else {
         premiumWarning.textContent = "";
@@ -175,19 +238,32 @@ document.addEventListener("DOMContentLoaded", () => {
 
     latestAudit = {
       ...values,
-      workerName: workerName.value.trim(),
-      area: area.value,
-      grade: grade.value,
-      auditMonth: auditMonth.value,
+      workerName: workerName?.value.trim() || "",
+      area: area?.value || "area12",
+      grade: grade?.value || "C",
+      auditMonth: auditMonth?.value || "",
       ordinaryShifts: numberValue(ordinaryShifts),
       nightShifts: numberValue(nightShifts),
       specialShifts: numberValue(specialShifts),
-      cleaningAllowance: cleaningAllowance.checked,
-      feedbackConsent: feedbackConsent.checked,
+      cleaningAllowance: cleaningAllowance?.checked || false,
+      transferAllowance: transferAllowance?.checked || false,
+      feedbackConsent: feedbackConsent?.checked || false,
       createdAt: new Date().toISOString()
     };
 
     resultCard.classList.remove("hidden");
+
+    if (values.shortfall > 0) {
+      showNotification(
+        "A possible wage difference was identified. Keep all records for verification.",
+        "warning"
+      );
+    } else {
+      showNotification(
+        "Your preliminary wage audit is ready.",
+        "success"
+      );
+    }
   }
 
   function getAuditRecord() {
@@ -210,6 +286,11 @@ document.addEventListener("DOMContentLoaded", () => {
       "Audit saved locally on this device.";
 
     savedMessage.classList.remove("hidden");
+
+    showNotification(
+      "Your wage audit was saved locally on this device.",
+      "success"
+    );
   }
 
   function downloadText(text, filename) {
@@ -222,6 +303,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
     link.href = url;
     link.download = filename;
+
     document.body.appendChild(link);
     link.click();
     link.remove();
@@ -238,19 +320,29 @@ document.addEventListener("DOMContentLoaded", () => {
       "CIVIC LEDGER PRELIMINARY WAGE AUDIT",
       "",
       `Audit month: ${record.auditMonth || "Not entered"}`,
+      `Worker reference: ${record.workerName || "Not entered"}`,
       `Wage area: ${record.area}`,
       `Security grade: ${record.grade}`,
-      `Ordinary shifts: ${record.ordinaryShifts}`,
+      `Ordinary shifts entered: ${record.ordinaryShifts}`,
       `Sunday hours requiring review: ${record.sundayHours}`,
       `Public-holiday hours requiring review: ${record.holidayHours}`,
       `Night shifts: ${record.nightShifts}`,
       `Qualifying allowance shifts: ${record.specialShifts}`,
-      `Actual pay: ${money(record.receivedPay)}`,
+      `Cleaning allowance included: ${record.cleaningAllowance ? "Yes" : "No"}`,
+      `Transfer allowance included: ${record.transferAllowance ? "Yes" : "No"}`,
+      "",
+      `Reference minimum wage: ${money(record.baseWage)}`,
+      `Night allowance: ${money(record.nightTotal)}`,
+      `Qualifying-duty allowance: ${money(record.specialTotal)}`,
+      `Cleaning allowance: ${money(record.cleaningTotal)}`,
+      `Transfer allowance: ${money(record.transferTotal)}`,
+      `Actual pay entered: ${money(record.receivedPay)}`,
       `Estimated reference total: ${money(record.referenceTotal)}`,
       `Preliminary possible difference: ${money(record.shortfall)}`,
       "",
       "This is an independent estimate, not an official determination.",
-      "Verify against payslips, contracts, rosters, the applicable agreement and payroll records."
+      "Verify against payslips, contract, rosters, the applicable agreement and payroll records.",
+      "Sunday and public-holiday hours require separate verification."
     ].join("
 ");
 
@@ -258,19 +350,32 @@ document.addEventListener("DOMContentLoaded", () => {
       report,
       `civic-ledger-wage-audit-${record.auditMonth || "report"}.txt`
     );
+
+    showNotification(
+      "Your wage-audit report was exported as a text file.",
+      "success"
+    );
   }
 
   function createSiteReport() {
-    const siteName = $("siteName").value.trim();
-    const siteAddress = $("siteAddress").value.trim();
-    const securityCompany = $("securityCompany").value.trim();
-    const guardsAffected = Number($("guardsAffected").value) || 0;
-    const expectedPay = Number($("expectedPay").value) || 0;
-    const actualSitePay = Number($("actualSitePay").value) || 0;
-    const siteConcern = $("siteConcern").value.trim();
+    const siteName = $("siteName")?.value.trim() || "";
+    const siteAddress = $("siteAddress")?.value.trim() || "";
+    const securityCompany =
+      $("securityCompany")?.value.trim() || "";
+
+    const guardsAffected =
+      Number($("guardsAffected")?.value) || 0;
+
+    const expectedPay =
+      Number($("expectedPay")?.value) || 0;
+
+    const actualSitePay =
+      Number($("actualSitePay")?.value) || 0;
+
+    const siteConcern = $("siteConcern")?.value.trim() || "";
 
     const reporterMode =
-      $("reporterMode")?.value || "anonymous";
+      $("reporterMode")?.value || "anonymous-local";
 
     const reporterLanguage =
       $("reporterLanguage")?.value || "English";
@@ -295,27 +400,32 @@ document.addEventListener("DOMContentLoaded", () => {
       !siteConcern ||
       !confirmInformation
     ) {
-      siteReportResult.textContent =
+      const message =
         "Complete the worksite, address, company, affected-guard number, concern and confirmation fields.";
 
+      siteReportResult.textContent = message;
       siteReportResult.classList.remove("hidden");
+
+      showNotification(message, "warning");
       return;
     }
 
-   calculateAudit();
-const audit = latestAudit;  
+    calculateAudit();
+
+    const audit = latestAudit;
     const caseNumber = createCaseNumber();
     const accessCode = secureCode(10);
     const now = new Date().toISOString();
 
     const estimatedShortfall =
-      Math.max(expectedPay - actualSitePay, 0) * guardsAffected;
+      Math.max(expectedPay - actualSitePay, 0) *
+      guardsAffected;
 
     latestCase = {
       caseNumber,
       accessCode,
       createdAt: now,
-      status: "Submitted",
+      status: "Saved locally",
       lastUpdated: now,
       siteName,
       siteAddress,
@@ -344,13 +454,18 @@ const audit = latestAudit;
     );
 
     showCaseResult(latestCase);
+
+    showNotification(
+      "Your local case record and evidence pack were created on this device.",
+      "success"
+    );
   }
 
   function showCaseResult(caseData) {
     siteReportResult.innerHTML = `
       <div class="case-result">
         <div class="case-number">
-          Case number: ${escapeHtml(caseData.caseNumber)}
+          Local case number: ${escapeHtml(caseData.caseNumber)}
         </div>
 
         <p>
@@ -362,11 +477,11 @@ const audit = latestAudit;
 
         <p>
           <strong>Status:</strong>
-          Submitted
+          Saved locally on this device
         </p>
 
         <p>
-          Saved locally on this device. It has not been sent to inspectors.
+          This record has not been sent to inspectors, government departments, employers, unions or any other organisation.
         </p>
       </div>
     `;
@@ -394,7 +509,7 @@ const audit = latestAudit;
 
     casePackContent.innerHTML = `
       <div class="print-row">
-        <span class="print-label">Case number</span>
+        <span class="print-label">Local case number</span>
         <span>${escapeHtml(caseData.caseNumber)}</span>
       </div>
 
@@ -409,7 +524,7 @@ const audit = latestAudit;
       </div>
 
       <div class="print-row">
-        <span class="print-label">Submitted</span>
+        <span class="print-label">Created</span>
         <span>${escapeHtml(new Date(caseData.createdAt).toLocaleString("en-ZA"))}</span>
       </div>
 
@@ -440,7 +555,22 @@ const audit = latestAudit;
 
       <div class="print-row">
         <span class="print-label">Guards affected</span>
-        <span>${caseData.guardsAffected}</span>
+        <span>${escapeHtml(caseData.guardsAffected)}</span>
+      </div>
+
+      <div class="print-row">
+        <span class="print-label">Expected monthly pay per guard</span>
+        <span>${money(caseData.expectedPay)}</span>
+      </div>
+
+      <div class="print-row">
+        <span class="print-label">Actual monthly pay per guard</span>
+        <span>${money(caseData.actualSitePay)}</span>
+      </div>
+
+      <div class="print-row">
+        <span class="print-label">Estimated site difference</span>
+        <span>${money(caseData.estimatedShortfall)}</span>
       </div>
 
       <div class="print-row">
@@ -449,18 +579,18 @@ const audit = latestAudit;
       </div>
 
       <div class="print-row">
-        <span class="print-label">Preliminary wage difference</span>
+        <span class="print-label">Individual preliminary wage difference</span>
         <span>${money(audit.shortfall || 0)}</span>
       </div>
 
       <div class="print-row">
         <span class="print-label">Sunday hours requiring review</span>
-        <span>${audit.sundayHours || 0}</span>
+        <span>${escapeHtml(audit.sundayHours || 0)}</span>
       </div>
 
       <div class="print-row">
         <span class="print-label">Public-holiday hours requiring review</span>
-        <span>${audit.holidayHours || 0}</span>
+        <span>${escapeHtml(audit.holidayHours || 0)}</span>
       </div>
 
       <h3>Evidence available</h3>
@@ -474,8 +604,8 @@ const audit = latestAudit;
 
       <p class="help-text">
         This document records information supplied by the reporter.
-        It is not an official finding. Verification requires payroll,
-        roster, contract and payment records.
+        It is not an official finding, submission or determination.
+        Verification requires payroll, roster, contract and payment records.
       </p>
 
       <h3>Official follow-up</h3>
@@ -488,15 +618,22 @@ const audit = latestAudit;
   }
 
   function checkStatus() {
-    const caseNumber = $("statusCaseNumber")?.value.trim();
-    const accessCode = $("statusAccessCode")?.value.trim();
+    const caseNumber =
+      $("statusCaseNumber")?.value.trim() || "";
+
+    const accessCode =
+      $("statusAccessCode")?.value.trim() || "";
+
     const statusResult = $("statusResult");
 
     if (!caseNumber || !accessCode) {
-      statusResult.textContent =
-        "Enter both the case number and private access code.";
+      const message =
+        "Enter both the local case number and private access code.";
 
+      statusResult.textContent = message;
       statusResult.classList.remove("hidden");
+
+      showNotification(message, "warning");
       return;
     }
 
@@ -505,10 +642,13 @@ const audit = latestAudit;
     );
 
     if (!stored) {
-      statusResult.textContent =
-        "No case was found on this device.";
+      const message =
+        "No local case record was found on this device and browser.";
 
+      statusResult.textContent = message;
       statusResult.classList.remove("hidden");
+
+      showNotification(message, "warning");
       return;
     }
 
@@ -517,18 +657,24 @@ const audit = latestAudit;
     try {
       caseData = JSON.parse(stored);
     } catch (error) {
-      statusResult.textContent =
-        "This case record could not be read.";
+      const message =
+        "This local case record could not be read.";
 
+      statusResult.textContent = message;
       statusResult.classList.remove("hidden");
+
+      showNotification(message, "warning");
       return;
     }
 
     if (caseData.accessCode !== accessCode) {
-      statusResult.textContent =
-        "The case number or private access code is incorrect.";
+      const message =
+        "The local case number or private access code is incorrect.";
 
+      statusResult.textContent = message;
       statusResult.classList.remove("hidden");
+
+      showNotification(message, "warning");
       return;
     }
 
@@ -546,12 +692,17 @@ const audit = latestAudit;
         </p>
 
         <p>
-          No departmental action can be confirmed by this local prototype.
+          This local prototype cannot confirm departmental action because no report has been sent from the app.
         </p>
       </div>
     `;
 
     statusResult.classList.remove("hidden");
+
+    showNotification(
+      "Local case record found on this device.",
+      "success"
+    );
   }
 
   function printCasePack() {
@@ -561,6 +712,11 @@ const audit = latestAudit;
       !casePack ||
       casePack.classList.contains("hidden")
     ) {
+      showNotification(
+        "Create a local case record before printing an evidence pack.",
+        "warning"
+      );
+
       return;
     }
 
@@ -605,6 +761,34 @@ const audit = latestAudit;
     "click",
     printCasePack
   );
+
+  closeNotificationButton?.addEventListener(
+    "click",
+    hideNotification
+  );
+
+  setDefaultAuditMonth();
+
+  if (!navigator.onLine) {
+    showNotification(
+      "You are offline. Civic Ledger can still save local records on this device.",
+      "info"
+    );
+  }
+
+  window.addEventListener("offline", () => {
+    showNotification(
+      "You are offline. Records remain available only on this device.",
+      "warning"
+    );
+  });
+
+  window.addEventListener("online", () => {
+    showNotification(
+      "Internet connection restored.",
+      "success"
+    );
+  });
 
   if ("serviceWorker" in navigator) {
     window.addEventListener("load", () => {
