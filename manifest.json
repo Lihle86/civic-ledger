@@ -1,0 +1,24 @@
+{
+  "name": "Civic Ledger Wage Audit",
+  "short_name": "Civic Ledger",
+  "description": "Free wage-audit and local evidence-record pilot for private-security workers",
+  "start_url": "./index.html",
+  "scope": "./",
+  "display": "standalone",
+  "background_color": "#e2e8f0",
+  "theme_color": "#0f172a",
+  "icons": [
+    {
+      "src": "./icon.svg",
+      "sizes": "any",
+      "type": "image/svg+xml",
+      "purpose": "any"
+    },
+    {
+      "src": "./icon-32.png",
+      "sizes": "32x32",
+      "type": "image/png",
+      "purpose": "any"
+    }
+  ]
+}
