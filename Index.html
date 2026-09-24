@@ -1,0 +1,647 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+
+  <meta
+    name="viewport"
+    content="width=device-width, initial-scale=1.0"
+  >
+
+  <meta name="theme-color" content="#0f172a">
+
+  <meta
+    name="description"
+    content="Free Civic Ledger wage-audit pilot for private-security workers"
+  >
+
+  <title>Civic Ledger Wage Audit</title>
+
+  <link rel="stylesheet" href="./style.css">
+  <link rel="manifest" href="./manifest.json">
+  <link rel="icon" href="./icon.svg" type="image/svg+xml">
+  <link
+    rel="icon"
+    href="./icon-32.png"
+    sizes="32x32"
+    type="image/png"
+  >
+</head>
+
+<body>
+  <main class="app-shell">
+
+    <div
+      id="notificationPanel"
+      class="notification-panel hidden"
+      role="status"
+      aria-live="polite"
+    >
+      <span id="notificationMessage"></span>
+
+      <button
+        id="closeNotificationButton"
+        type="button"
+        aria-label="Close notification"
+      >
+        ×
+      </button>
+    </div>
+
+    <header class="app-header">
+      <div class="logo">CL</div>
+
+      <div>
+        <h1>Civic Ledger</h1>
+        <p>Free wage-audit pilot</p>
+      </div>
+    </header>
+
+    <section class="card introduction">
+      <h2>Understand your pay records</h2>
+
+      <p>
+        Enter your work information to estimate the difference between
+        the reference wage and the amount you received.
+      </p>
+
+      <div class="warning">
+        <strong>Important:</strong>
+        This is an independent community pilot. It is not an official
+        government service, labour inspectorate, union or legal adviser.
+        The result is an estimate and must be checked against your
+        payslip, contract, roster and the applicable agreement.
+      </div>
+    </section>
+
+    <section class="card">
+      <h2>Work profile</h2>
+
+      <label for="workerName">
+        Name or private reference
+      </label>
+
+      <input
+        id="workerName"
+        type="text"
+        maxlength="60"
+        placeholder="Optional — do not enter your ID number"
+      >
+
+      <label for="area">Wage area</label>
+
+      <select id="area">
+        <option value="area12">
+          Area 1 &amp; 2 — Major cities and urban centres
+        </option>
+
+        <option value="area3">
+          Area 3 — Other areas and rural areas
+        </option>
+      </select>
+
+      <label for="grade">Security grade</label>
+
+      <select id="grade">
+        <option value="A">Grade A</option>
+        <option value="B">Grade B</option>
+        <option value="C" selected>Grade C</option>
+        <option value="D">Grade D</option>
+        <option value="E">Grade E</option>
+      </select>
+
+      <label for="auditMonth">Audit month</label>
+
+      <input
+        id="auditMonth"
+        type="month"
+      >
+    </section>
+
+    <section class="card">
+      <h2>Work and payment information</h2>
+
+      <label for="ordinaryShifts">
+        Ordinary shifts entered — 12-hour units
+      </label>
+
+      <input
+        id="ordinaryShifts"
+        type="number"
+        min="0"
+        step="1"
+        value="16"
+      >
+
+      <p class="help-text">
+        The default of 16 is an example of a full monthly shift pattern.
+        The final amount must be checked against the worker’s contract,
+        roster and applicable agreement.
+      </p>
+
+      <label for="sundayHours">
+        Sunday hours worked
+      </label>
+
+      <input
+        id="sundayHours"
+        type="number"
+        min="0"
+        step="0.5"
+        value="0"
+      >
+
+      <label for="holidayHours">
+        Public-holiday hours worked
+      </label>
+
+      <input
+        id="holidayHours"
+        type="number"
+        min="0"
+        step="0.5"
+        value="0"
+      >
+
+      <p class="help-text">
+        Sunday and public-holiday hours are recorded for your audit
+        record. They are not included in this preliminary estimate
+        because the correct calculation depends on the applicable
+        agreement and employment details.
+      </p>
+
+      <label for="nightShifts">
+        Night shifts worked
+      </label>
+
+      <input
+        id="nightShifts"
+        type="number"
+        min="0"
+        step="1"
+        value="0"
+      >
+
+      <label for="specialShifts">
+        Qualifying allowance shifts
+      </label>
+
+      <input
+        id="specialShifts"
+        type="number"
+        min="0"
+        step="1"
+        value="0"
+      >
+
+      <p class="help-text">
+        Enter only shifts linked to a qualifying allowance, such as
+        mobile supervisor, armed officer, national key point or canine
+        duties.
+      </p>
+
+      <label class="checkbox-row">
+        <input
+          id="cleaningAllowance"
+          type="checkbox"
+          checked
+        >
+
+        <span>
+          Include R32 monthly cleaning allowance
+        </span>
+      </label>
+
+      <label class="checkbox-row">
+        <input
+          id="transferAllowance"
+          type="checkbox"
+        >
+
+        <span>
+          Include R100 transfer allowance — only if transferred more
+          than 60 km
+        </span>
+      </label>
+
+      <label for="actualPay">
+        Actual basic pay received for this audit month
+      </label>
+
+      <input
+        id="actualPay"
+        type="number"
+        min="0"
+        step="0.01"
+        placeholder="Example: 7000"
+      >
+
+      <p class="help-text">
+        Enter the amount actually paid for the selected month. Keep the
+        payslip, bank record or payment message for verification.
+      </p>
+
+      <button id="auditButton" type="button">
+        Run wage audit
+      </button>
+
+      <button
+        id="clearButton"
+        type="button"
+        class="secondary-button"
+      >
+        Clear form
+      </button>
+    </section>
+
+    <section
+      id="resultCard"
+      class="card result-card hidden"
+    >
+      <div class="result-header">
+        <h2>Estimated result</h2>
+
+        <span
+          id="resultStatus"
+          class="status"
+        >
+          Preliminary estimate
+        </span>
+      </div>
+
+      <p class="result-label">
+        Preliminary possible difference
+      </p>
+
+      <div
+        id="difference"
+        class="main-amount"
+      >
+        R 0.00
+      </div>
+
+      <p
+        id="resultMessage"
+        class="result-message"
+      ></p>
+
+      <p
+        id="premiumWarning"
+        class="warning hidden"
+      ></p>
+
+      <div class="calculation">
+        <div class="calculation-row">
+          <span>Reference minimum wage</span>
+          <strong id="minimumWage">R 0.00</strong>
+        </div>
+
+        <div class="calculation-row">
+          <span>Night allowance</span>
+          <strong id="nightAmount">R 0.00</strong>
+        </div>
+
+        <div class="calculation-row">
+          <span>Special allowance</span>
+          <strong id="specialAmount">R 0.00</strong>
+        </div>
+
+        <div class="calculation-row">
+          <span>Cleaning allowance</span>
+          <strong id="cleaningAmount">R 0.00</strong>
+        </div>
+
+        <div class="calculation-row">
+          <span>Transfer allowance</span>
+          <strong id="transferAmount">R 0.00</strong>
+        </div>
+
+        <div class="calculation-row total-row">
+          <span>Estimated reference total</span>
+          <strong id="estimatedTotal">R 0.00</strong>
+        </div>
+
+        <div class="calculation-row">
+          <span>Actual pay entered</span>
+          <strong id="actualPayResult">R 0.00</strong>
+        </div>
+
+        <div class="calculation-row">
+          <span>Sunday hours requiring review</span>
+          <strong id="sundayHoursResult">0</strong>
+        </div>
+
+        <div class="calculation-row">
+          <span>Public-holiday hours requiring review</span>
+          <strong id="holidayHoursResult">0</strong>
+        </div>
+      </div>
+
+      <button
+        id="saveButton"
+        type="button"
+      >
+        Save locally on this device
+      </button>
+
+      <button
+        id="exportButton"
+        type="button"
+        class="secondary-button"
+      >
+        Export report as text
+      </button>
+    </section>
+
+    <section class="card">
+      <h2>Create local record and evidence pack</h2>
+
+      <p class="help-text">
+        This section creates a local record in this browser on this
+        device. It does not send a complaint or report to inspectors,
+        government departments, employers, unions or any organisation.
+      </p>
+
+      <label for="reporterMode">
+        Record preference
+      </label>
+
+      <select id="reporterMode">
+        <option value="no-name-entered">
+          No name entered — local device record
+        </option>
+
+        <option value="name-or-reference-entered">
+          Name or reference entered — local device record
+        </option>
+      </select>
+
+      <label for="reporterLanguage">
+        Preferred language
+      </label>
+
+      <select id="reporterLanguage">
+        <option value="English">English</option>
+        <option value="isiZulu">isiZulu</option>
+        <option value="isiXhosa">isiXhosa</option>
+        <option value="Sesotho">Sesotho</option>
+        <option value="Setswana">Setswana</option>
+        <option value="Other">Other</option>
+      </select>
+
+      <label for="siteName">
+        Client or worksite name
+      </label>
+
+      <input
+        id="siteName"
+        type="text"
+        maxlength="100"
+        placeholder="Example: Worksite name"
+      >
+
+      <label for="siteAddress">
+        Exact worksite address
+      </label>
+
+      <textarea
+        id="siteAddress"
+        rows="3"
+        maxlength="250"
+        placeholder="Enter the physical address of the site"
+      ></textarea>
+
+      <label for="securityCompany">
+        Security company
+      </label>
+
+      <input
+        id="securityCompany"
+        type="text"
+        maxlength="100"
+        placeholder="Company name, if known"
+      >
+
+      <label for="guardsAffected">
+        Number of guards affected
+      </label>
+
+      <input
+        id="guardsAffected"
+        type="number"
+        min="1"
+        step="1"
+        placeholder="Example: 12"
+      >
+
+      <label for="expectedPay">
+        Expected monthly pay per guard
+      </label>
+
+      <input
+        id="expectedPay"
+        type="number"
+        min="0"
+        step="0.01"
+        placeholder="Optional"
+      >
+
+      <label for="actualSitePay">
+        Actual monthly pay per guard
+      </label>
+
+      <input
+        id="actualSitePay"
+        type="number"
+        min="0"
+        step="0.01"
+        placeholder="Optional"
+      >
+
+      <label for="siteConcern">
+        What appears to require verification?
+      </label>
+
+      <textarea
+        id="siteConcern"
+        rows="5"
+        maxlength="1000"
+        placeholder="Describe the issue without entering ID numbers or bank details"
+      ></textarea>
+
+      <label for="documentsAvailable">
+        Documents currently available
+      </label>
+
+      <textarea
+        id="documentsAvailable"
+        rows="3"
+        maxlength="500"
+        placeholder="Example: bank SMS, roster, payslip, WhatsApp messages, or no documents"
+      ></textarea>
+
+      <label for="documentsMissing">
+        Documents not available
+      </label>
+
+      <textarea
+        id="documentsMissing"
+        rows="3"
+        maxlength="500"
+        placeholder="Example: employer keeps payslips or no written contract"
+      ></textarea>
+
+      <label for="reporterStatement">
+        Your statement
+      </label>
+
+      <textarea
+        id="reporterStatement"
+        rows="6"
+        maxlength="2000"
+        placeholder="Explain what happened in your own words. You may write in your preferred language."
+      ></textarea>
+
+      <label class="checkbox-row">
+        <input
+          id="confirmInformation"
+          type="checkbox"
+        >
+
+        <span>
+          I confirm that this record is based on information I believe
+          to be accurate.
+        </span>
+      </label>
+
+      <button
+        id="siteReportButton"
+        type="button"
+      >
+        Create local record and evidence pack
+      </button>
+
+      <div
+        id="siteReportResult"
+        class="success-message hidden"
+        role="status"
+        aria-live="polite"
+      ></div>
+
+      <button
+        id="printCaseButton"
+        type="button"
+        class="secondary-button hidden"
+      >
+        Print evidence pack
+      </button>
+    </section>
+
+    <section class="card">
+      <h2>Find local case record</h2>
+
+      <p class="help-text">
+        Enter the local case number and private access code. This
+        prototype can only find records created in this same browser on
+        this same device.
+      </p>
+
+      <label for="statusCaseNumber">
+        Local case number
+      </label>
+
+      <input
+        id="statusCaseNumber"
+        type="text"
+        maxlength="40"
+        placeholder="Example: CL-2026-ABC123"
+      >
+
+      <label for="statusAccessCode">
+        Private access code
+      </label>
+
+      <input
+        id="statusAccessCode"
+        type="text"
+        maxlength="20"
+        placeholder="Enter your private access code"
+      >
+
+      <button
+        id="statusButton"
+        type="button"
+      >
+        Find local record
+      </button>
+
+      <div
+        id="statusResult"
+        class="success-message hidden"
+        role="status"
+        aria-live="polite"
+      ></div>
+    </section>
+
+    <section
+      id="casePack"
+      class="card case-pack hidden"
+    >
+      <h2>Civic Ledger Wage Evidence Pack</h2>
+
+      <p class="help-text">
+        Keep this document and supporting records. It is an independent
+        local record and not an official finding or submission.
+      </p>
+
+      <div id="casePackContent"></div>
+    </section>
+
+    <section class="card">
+      <h2>Privacy notice</h2>
+
+      <p class="privacy-text">
+        Do not enter your South African ID number, PSIRA number,
+        passwords, bank details or payslip images. This pilot stores
+        audit and local case records only on this device when you choose
+        to save or create a record.
+      </p>
+
+      <p class="privacy-text">
+        This prototype does not send reports to government departments,
+        employers, unions, bargaining councils or inspectors.
+      </p>
+
+      <label class="checkbox-row">
+        <input
+          id="feedbackConsent"
+          type="checkbox"
+        >
+
+        <span>
+          I agree to be contacted about pilot feedback.
+        </span>
+      </label>
+
+      <div
+        id="savedMessage"
+        class="success-message hidden"
+        role="status"
+        aria-live="polite"
+      ></div>
+    </section>
+
+    <footer class="app-footer">
+      <p>Civic Ledger Pilot v1.2</p>
+      <p>Reference period: 1 March 2026 – 28 February 2027</p>
+      <p>
+        Independent estimate only — verify against the applicable
+        agreement and payroll records.
+      </p>
+    </footer>
+
+  </main>
+
+  <script src="./app.js"></script>
+</body>
+</html>
