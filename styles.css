@@ -1,0 +1,84 @@
+:root {
+    --bg-primary: #121824;
+    --card-bg: #1e293b;
+    --text-main: #f8fafc;
+    --text-muted: #94a3b8;
+    --accent: #2563eb;
+    --success: #10b981;
+    --danger: #ef4444;
+    --warning: #f59e0b;
+}
+
+body {
+    margin: 0;
+    font-family: -apple-system, BlinkMacSystemFont, sans-serif;
+    background-color: var(--bg-primary);
+    color: var(--text-main);
+    display: flex;
+    justify-content: center;
+    padding: 15px;
+}
+
+.app-container { width: 100%; max-width: 480px; }
+.screen { display: none; }
+.screen.active { display: block; }
+
+.brand-header { text-align: center; margin-bottom: 25px; margin-top: 10px; }
+.logo-shield {
+    width: 70px;
+    height: 70px;
+    background: radial-gradient(circle, #2563eb 0%, #1e3a8a 100%);
+    border: 3px solid #f8fafc;
+    border-radius: 50% 50% 12px 12px;
+    margin: 0 auto 15px auto;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: bold;
+    font-size: 1.6rem;
+    letter-spacing: 1px;
+    box-shadow: 0 4px 10px rgba(0,0,0,0.4);
+}
+.brand-header h1 { letter-spacing: 1.5px; margin: 0; font-size: 1.8rem; }
+.brand-header p { color: var(--text-muted); font-size: 0.85rem; margin-top: 5px; }
+
+.card { background: var(--card-bg); border-radius: 12px; padding: 20px; margin-bottom: 20px; box-shadow: 0 4px 8px rgba(0,0,0,0.3); }
+.card h3 { margin-top: 0; border-bottom: 1px solid #334155; padding-bottom: 10px; font-size: 1rem; color: var(--text-main); }
+
+.form-group { display: flex; flex-direction: column; margin-bottom: 15px; }
+.form-group label { font-size: 0.8rem; color: var(--text-muted); margin-bottom: 6px; }
+input, select { background: #0f172a; border: 1px solid #334155; padding: 12px; border-radius: 6px; color: var(--text-main); font-size: 1rem; }
+
+.grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; }
+button { width: 100%; padding: 14px; border-radius: 6px; font-weight: bold; cursor: pointer; border: none; font-size: 1rem; }
+.btn-primary { background: var(--accent); color: white; }
+.btn-success { background: var(--success); color: white; }
+.btn-danger { background: var(--danger); color: white; padding: 8px 12px; width: auto; font-size: 0.8rem; border-radius: 4px; }
+.btn-outline { background: transparent; border: 1px solid var(--text-muted); color: var(--text-main); margin-bottom: 10px; }
+.btn-report { background: var(--warning); color: #000; }
+
+.shared-device-notice { margin-top: 15px; background: #292524; border-left: 4px solid var(--warning); padding: 10px; border-radius: 4px; }
+.shared-device-notice p { margin: 0; font-size: 0.75rem; color: #fcd34d; line-height: 1.3; }
+
+.dashboard-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; }
+.dashboard-header h2 { margin: 0; font-size: 1.2rem; }
+.badge { background: #1e3a8a; color: #93c5fd; padding: 3px 8px; font-size: 0.7rem; border-radius: 12px; display: block; margin-top: 4px; }
+
+.tally-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+.tally-box { background: #0f172a; padding: 14px; border-radius: 8px; text-align: center; border-bottom: 4px solid var(--text-muted); }
+.tally-box.premium { border-bottom-color: var(--accent); }
+.tally-box.holiday { border-bottom-color: var(--success); }
+.tally-val { display: block; font-size: 1.6rem; font-weight: bold; margin-bottom: 3px; }
+.tally-lbl { font-size: 0.7rem; color: var(--text-muted); }
+
+.qr-container { background: #0f172a; border-left: 4px solid var(--accent); }
+.qr-layout { display: flex; align-items: center; gap: 15px; }
+.qr-graphic { background: #fff; padding: 4px; border-radius: 6px; flex-shrink: 0; }
+.qr-details h4 { margin: 0 0 4px 0; font-size: 0.95rem; }
+.qr-details p { margin: 0; font-size: 0.75rem; color: var(--text-muted); line-height: 1.3; }
+
+.platform-status-card { border-top: 4px solid var(--success); background: #131c2e; }
+.status-badge-row { display: flex; align-items: center; gap: 8px; font-size: 0.8rem; color: var(--success); margin-bottom: 8px; }
+.status-dot-active { width: 8px; height: 8px; background-color: var(--success); border-radius: 50%; display: inline-block; animation: pulse 2s infinite; }
+.founder-credo { font-size: 0.75rem; color: var(--text-muted); line-height: 1.4; margin: 0 0 15px 0; font-style: italic; }
+@keyframes pulse { 0% { opacity: 0.4; } 50% { opacity: 1; } 100% { opacity: 0.4; } }
