@@ -11,7 +11,12 @@
         <!-- 1. SECURE MASKED LOGIN SCREEN -->
         <div id="login-screen" class="screen active">
             <div class="brand-header">
-                <div class="logo-shield">CL</div>
+                <!-- Displays your crisp 512x512 logo image file seamlessly -->
+                <img src="512x512.png" alt="Civic Ledger Verification Logo" class="logo-shield-img" onerror="this.style.display='none'; document.getElementById('backup-shield').style.display='flex';">
+                
+                <!-- Fallback safety code if the image file is ever missing -->
+                <div id="backup-shield" class="logo-shield" style="display:none;">CL</div>
+                
                 <h1>CIVIL LEDGER</h1>
                 <p>The Independent Truth Engine for Workers</p>
             </div>
