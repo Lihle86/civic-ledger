@@ -1,0 +1,139 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Civil Ledger - Independent Truth Engine</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <div class="app-container">
+        <!-- 1. SECURE MASKED LOGIN SCREEN -->
+        <div id="login-screen" class="screen active">
+            <div class="brand-header">
+                <div class="logo-shield">CL</div>
+                <h1>CIVIL LEDGER</h1>
+                <p>The Independent Truth Engine for Workers</p>
+            </div>
+            <div class="card">
+                <h3>Secure Portal Access</h3>
+                <div class="form-group">
+                    <label>ID or PSiRA Number</label>
+                    <input type="text" id="username" placeholder="e.g., 9204125555081">
+                </div>
+                <div class="form-group">
+                    <label>Choose Password Type</label>
+                    <select id="pwd-type">
+                        <option value="pin">5+ Digit Numeric PIN / Company ID</option>
+                        <option value="word">Memorable Word / Physical Address</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label>Enter Password</label>
+                    <input type="password" id="password" placeholder="••••••••">
+                </div>
+                <button onclick="handleLogin()" class="btn-primary">🔓 Secure Login</button>
+                <div class="shared-device-notice">
+                    <p>⚠️ Borrowing a phone? The app automatically logs out after 2 minutes of idle time to protect your data privacy.</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- 2. MAIN DASHBOARD SCREEN (ACTIVE POST-LOGIN) -->
+        <div id="dashboard-screen" class="screen">
+            <div class="dashboard-header">
+                <div>
+                    <h2>Welcome, Officer</h2>
+                    <span class="badge">PSiRA Verified Ecosystem</span>
+                </div>
+                <button onclick="handleLogout()" class="btn-danger">Log Out</button>
+            </div>
+
+            <!-- Shift Logger Form -->
+            <div class="card">
+                <h3>Log a Completed Shift</h3>
+                <div class="grid-2">
+                    <div class="form-group">
+                        <label>Date</label>
+                        <input type="date" id="shift-date">
+                    </div>
+                    <div class="form-group">
+                        <label>Shift Type (Commencement)</label>
+                        <select id="shift-type">
+                            <option value="normal">Normal Weekday Shift</option>
+                            <option value="sunday">Sunday Shift (Entire 12h Block)</option>
+                            <option value="holiday">Public Holiday Shift (2x Multiplier)</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="grid-2">
+                    <div class="form-group">
+                        <label>Hours Worked</label>
+                        <input type="number" id="shift-hours" value="12" min="1" max="24">
+                    </div>
+                    <div class="form-group">
+                        <label>OB Reference / Site Target</label>
+                        <input type="text" id="shift-ob" placeholder="e.g., OB 47/Strand">
+                    </div>
+                </div>
+                <button onclick="addShift()" class="btn-success">➕ Save Shift to Local Ledger</button>
+            </div>
+
+            <!-- Sectoral Determination 6 Running Tally Display -->
+            <div class="card summary-card">
+                <h3>Your Running Roster Summary</h3>
+                <div class="tally-grid">
+                    <div class="tally-box">
+                        <span class="tally-val" id="tally-ordinary">0</span>
+                        <span class="tally-lbl">Ordinary Hours (Max 208)</span>
+                    </div>
+                    <div class="tally-box premium">
+                        <span class="tally-val" id="tally-overtime">0</span>
+                        <span class="tally-lbl">Overtime Hours (1.5x)</span>
+                    </div>
+                    <div class="tally-box premium">
+                        <span class="tally-val" id="tally-sunday">0</span>
+                        <span class="tally-lbl">Sunday Hours (1.5x/2x)</span>
+                    </div>
+                    <div class="tally-box holiday">
+                        <span class="tally-val" id="tally-holiday">0</span>
+                        <span class="tally-lbl">Holiday Hours (2x)</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Professional Built-In QR Sharing Matrix -->
+            <div class="card qr-container">
+                <div class="qr-layout">
+                    <div class="qr-graphic">
+                        <svg width="100" height="100" viewBox="0 0 100 100" style="background:#fff; padding:2px;">
+                            <path d="M5,5 h25 v25 h-25 z M13,13 h9 v9 h-9 z M70,5 h25 v25 h-25 z M78,13 h9 v9 h-9 z M5,70 h25 v25 h-25 z M13,78 h9 v9 h-9 z M45,45 h15 v15 h-15 z" fill="#121824"/>
+                            <circle cx="50" cy="50" r="6" fill="#2563eb"/>
+                        </svg>
+                    </div>
+                    <div class="qr-details">
+                        <h4>Civic Ledger Verification Share</h4>
+                        <p>Let a colleague scan this screen to securely launch Civil Ledger on their phone with zero data friction.</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Regulatory Action Grounding -->
+            <div class="card platform-status-card">
+                <div class="status-badge-row">
+                    <span class="status-dot-active"></span>
+                    <strong>100% DATA-FREE CIVIC INFRASTRUCTURE</strong>
+                </div>
+                <p class="founder-credo">
+                    Built by a Security Officer, for Security Officers. Civil Ledger saves directly to your device storage without using internet data balances.
+                </p>
+                <div class="actions-container">
+                    <button onclick="alert('Compiling local unalterable hours to PDF...')" class="btn-outline">📥 Download My Timesheet (PDF)</button>
+                    <button onclick="triggerAnonymousSiteReport()" class="btn-report">🚨 Report Site Discrepancies (Anonymous Batch)</button>
+                </div>
+            </div>
+        </div>
+    </div>
+    <script src="app.js"></script>
+</body>
+</html>
